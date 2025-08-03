@@ -1,4 +1,4 @@
-# IDP-project
+# Food Hygiene Inspection and Reporting Platform:
 
 To run this project make sure you have the .env file in the root directory
 In the .env you can add the following with your credentials
