@@ -1,6 +1,6 @@
 # Node.js dependencies
 node_modules/
-
+.sql
 # Optional npm cache directory
 .npm/
 
