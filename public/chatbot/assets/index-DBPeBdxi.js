@@ -9249,7 +9249,7 @@ const zi = () =>
         }));
       try {
         const U = await fetch(
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyCCzWo4GDCCMf3PEzOvdq1mFZmoWjwhCws",
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=NEDDAPIKEY",
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
