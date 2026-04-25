@@ -143,12 +143,42 @@
               <div class="card-content drop-area">
                 <i data-lucide="camera" class="icon large gray"></i>
                 <p>Click to upload or drag and drop</p>
-                <input type="file" name="images" id="cameraInput" multiple accept="image/*" capture="environment"
-                  style="display: none;" />
-                <button type="button" class="btn primary" onclick="document.getElementById('cameraInput').click()"
-                  style="margin-top: 12px; width: 100%;">
-                  📸 Open Native Camera / Upload
-                </button>
+                <!-- Live Camera Integration Component -->
+                <div id="live-camera-module"
+                  style="display: none; background: #000; border-radius: 12px; overflow: hidden; position: relative; width: 100%; margin-top: 16px; margin-bottom: 16px;">
+                  <video id="camera-stream" autoplay playsinline
+                    style="width: 100%; height: auto; display: block;"></video>
+                  <button type="button" id="webrtc-capture-btn"
+                    style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: #ef4444; color: white; border: 4px solid rgba(255,255,255,0.4); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
+                    <i data-lucide="camera" style="width: 24px; height: 24px;"></i>
+                  </button>
+                  <button type="button" id="webrtc-close-btn"
+                    style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.5); color: white; border: none; padding: 8px; border-radius: 8px; cursor: pointer;">
+                    X
+                  </button>
+                </div>
+
+                <canvas id="camera-canvas" style="display: none;"></canvas>
+
+                <div id="camera-preview" style="display: none; margin-top: 16px; text-align: center;">
+                  <img id="preview-img"
+                    style="width: 100%; max-width: 400px; border-radius: 8px; border: 2px solid #10b981;" />
+                  <p style="color: #10b981; font-weight: bold; margin-top: 8px;">✅ Image Captured!</p>
+                  <button type="button" id="webrtc-retake-btn" class="btn outline" style="margin-top: 8px;">Retake
+                    Photo</button>
+                </div>
+
+                <input type="file" name="images" id="cameraInput" multiple accept="image/*" style="display: none;" />
+
+                <div style="display: flex; gap: 12px; margin-top: 12px;">
+                  <button type="button" class="btn primary" id="open-live-camera-btn" style="flex: 1;">
+                    🔴 Open Live Camera
+                  </button>
+                  <button type="button" class="btn outline" onclick="document.getElementById('cameraInput').click()"
+                    style="flex: 1;">
+                    📁 Select from Gallery
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -166,6 +196,65 @@
 
     <script>
       lucide.createIcons();
+
+      // WebRTC Live Camera Logic
+      const openLiveCameraBtn = document.getElementById('open-live-camera-btn');
+      const liveCameraModule = document.getElementById('live-camera-module');
+      const cameraStream = document.getElementById('camera-stream');
+      const captureBtn = document.getElementById('webrtc-capture-btn');
+      const closeBtn = document.getElementById('webrtc-close-btn');
+      const canvas = document.getElementById('camera-canvas');
+      const cameraInput = document.getElementById('cameraInput');
+      const cameraPreview = document.getElementById('camera-preview');
+      const previewImg = document.getElementById('preview-img');
+      const retakeBtn = document.getElementById('webrtc-retake-btn');
+
+      let mediaStream = null;
+
+      async function startCamera() {
+        try {
+          mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+          cameraStream.srcObject = mediaStream;
+          liveCameraModule.style.display = 'block';
+          openLiveCameraBtn.style.display = 'none';
+          cameraPreview.style.display = 'none';
+        } catch (err) {
+          alert('Could not access camera. Please check your browser permissions.');
+          console.error(err);
+        }
+      }
+
+      function stopCamera() {
+        if (mediaStream) {
+          mediaStream.getTracks().forEach(track => track.stop());
+          mediaStream = null;
+        }
+        liveCameraModule.style.display = 'none';
+        openLiveCameraBtn.style.display = 'block';
+      }
+
+      openLiveCameraBtn.addEventListener('click', startCamera);
+      closeBtn.addEventListener('click', stopCamera);
+      retakeBtn.addEventListener('click', startCamera);
+
+      captureBtn.addEventListener('click', () => {
+        canvas.width = cameraStream.videoWidth;
+        canvas.height = cameraStream.videoHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(cameraStream, 0, 0, canvas.width, canvas.height);
+
+        canvas.toBlob(blob => {
+          const file = new File([blob], `inspection_snapshot_${Date.now()}.jpg`, { type: 'image/jpeg' });
+          const dt = new DataTransfer();
+          dt.items.add(file);
+          cameraInput.files = dt.files;
+
+          previewImg.src = URL.createObjectURL(blob);
+          stopCamera();
+          cameraPreview.style.display = 'block';
+          openLiveCameraBtn.style.display = 'none';
+        }, 'image/jpeg', 0.9);
+      });
     </script>
 </body>
 
