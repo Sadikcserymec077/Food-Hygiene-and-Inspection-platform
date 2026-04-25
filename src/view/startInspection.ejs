@@ -46,10 +46,19 @@
           <h1>Conduct Inspection</h1>
           <p>Complete the hygiene inspection checklist</p>
         </div>
-        <span class="badge <%= scoreBadge %>">Current Score: <%= hygieneScore %>/5.0</span>
+        <div style="text-align: right;">
+          <span class="badge <%= scoreBadge %>">Manual Target: <%= hygieneScore %>/5.0</span>
+          <div id="live-auto-score-container" style="margin-top: 8px;">
+            <span id="live-auto-score-badge"
+              style="background: #6366f1; color: white; padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; box-shadow: 0 4px 6px rgba(99, 102, 241, 0.2);">
+              Standardized Auto-Score: <span id="live-auto-score-value">0.00</span> / 5.0
+            </span>
+          </div>
+        </div>
       </div>
 
       <form action="/inspection/submit/<%= inspection.id %>" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="auto_score" id="auto_score_input" value="0.00">
 
         <!-- Restaurant Info -->
         <div class="card">
@@ -90,7 +99,8 @@
             <div class="card-content">
               <% Object.entries(items).forEach(([key, label])=> { %>
                 <label class="checkbox-row">
-                  <input type="checkbox" name="checklist[<%= section %>][<%= key %>]" />
+                  <input type="checkbox" name="checklist[<%= section %>][<%= key %>]" class="hygiene-checkbox"
+                    data-weight="<%= checklistWeights[section][key] %>" />
                   <span>
                     <%= label %>
                   </span>
@@ -219,6 +229,39 @@
         }
       }
 
+      // --- Phase 8: Auto Scoring Logic ---
+      const checkboxes = document.querySelectorAll('.hygiene-checkbox');
+      const liveScoreValue = document.getElementById('live-auto-score-value');
+      const autoScoreInput = document.getElementById('auto_score_input');
+      const TOTAL_MAX_POINTS = 85; // Sum of all weights: 10 + 10 + 30 + 15 + 20
+
+      function calculateLiveScore() {
+        let totalPoints = 0;
+        checkboxes.forEach(cb => {
+          if (cb.checked) {
+            totalPoints += parseInt(cb.dataset.weight || 0);
+          }
+        });
+        const calculated = (totalPoints / TOTAL_MAX_POINTS) * 5;
+        const finalScore = calculated.toFixed(2);
+
+        liveScoreValue.innerText = finalScore;
+        autoScoreInput.value = finalScore;
+
+        // Change color based on score
+        const badge = document.getElementById('live-auto-score-badge');
+        if (calculated >= 4) badge.style.background = '#10b981';
+        else if (calculated >= 2.5) badge.style.background = '#f59e0b';
+        else badge.style.background = '#ef4444';
+      }
+
+      checkboxes.forEach(cb => {
+        cb.addEventListener('change', calculateLiveScore);
+      });
+
+      // Initialize
+      calculateLiveScore();
+
       function stopCamera() {
         if (mediaStream) {
           mediaStream.getTracks().forEach(track => track.stop());
@@ -283,6 +326,14 @@
         const ctx = canvas.getContext('2d');
         ctx.drawImage(cameraStream, 0, 0, canvas.width, canvas.height);
 
+        // --- Phase 8: Image Quality Guardrail ---
+        const quality = ImageQualityGuard.analyze(canvas);
+        if (!quality.isGood) {
+          if (!confirm(`${quality.reason}\n\nDo you want to keep it anyway?`)) {
+            return; // Cancel capture
+          }
+        }
+
         canvas.toBlob(blob => {
           const file = new File([blob], `inspection_snapshot_${Date.now()}.jpg`, { type: 'image/jpeg' });
           capturedFiles.push(file);
@@ -295,6 +346,7 @@
         }, 'image/jpeg', 0.9);
       });
     </script>
+    <script src="/js/imageQualityGuard.js"></script>
 </body>
 
 </html>

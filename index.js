@@ -3,6 +3,10 @@ const express = require('express');
 const app = express();
 const db = require('./src/config/dbConnect');
 const session = require('express-session');
+const cronService = require('./src/services/cronService');
+
+// Initialize Background Sentinel Services
+cronService.init();
 
 // Trust Render's proxy (required for sessions + cookies on Render)
 app.set('trust proxy', 1);

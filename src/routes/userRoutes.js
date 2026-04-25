@@ -259,17 +259,50 @@ router.post('/user/complaint/:id', upload.array('images', 5), async (req, res) =
       ? req.files.map(file => file.path)
       : [];
 
+    // --- Phase 8: AI Complaint Triage ---
+    let ai_category = 'unclassified';
+    let ai_severity = 0;
+
+    try {
+      const { GoogleGenerativeAI } = require("@google/genai");
+      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+      const prompt = `Analyze this food hygiene complaint: 
+      Subject: ${subject}
+      Message: ${description}
+      
+      Categorize it into one of: [Pests, Unhygienic Kitchen, Staff Behavior, Food Quality, Cross Contamination, Other]. 
+      Assign a severity score (1-5, where 5 is critical).
+      Return ONLY a clean JSON object like: {"category": "Pests", "severity": 5}`;
+
+      const aiResult = await model.generateContent(prompt);
+      const aiResponseText = aiResult.response.text();
+
+      // Extract JSON (handling potential markdown formatting from AI)
+      const jsonMatch = aiResponseText.match(/\{.*\}/s);
+      if (jsonMatch) {
+        const triage = JSON.parse(jsonMatch[0]);
+        ai_category = triage.category;
+        ai_severity = triage.severity;
+      }
+    } catch (aiErr) {
+      console.error('AI Triage failed, continuing with defaults:', aiErr.message);
+    }
+
     await db.query(
       `INSERT INTO complaints 
-      (user_id, restaurant_id, subject, message, is_anonymous, images) 
-      VALUES (?, ?, ?, ?, ?, ?)`,
+      (user_id, restaurant_id, subject, message, is_anonymous, images, ai_category, ai_severity) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         userId,
         restaurantId,
         subject,
-        description,                 // ✅ saved as `message` in table
-        anonymous ? 1 : 0,          // ✅ matches `is_anonymous`
-        JSON.stringify(imagePaths)  // ✅ saves array as string
+        description,
+        anonymous ? 1 : 0,
+        JSON.stringify(imagePaths),
+        ai_category,
+        ai_severity
       ]
     );
 

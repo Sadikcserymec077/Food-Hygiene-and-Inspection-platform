@@ -171,15 +171,15 @@ router.get('/inspector/restaurants/add', (req, res) => {
 
 // POST route
 router.post('/inspector/restaurants/add', async (req, res) => {
-  const { name, license_number, contact_person, phone, email, address } = req.body;
+  const { name, license_number, contact_person, phone, email, address, license_expiry } = req.body;
   const { zone, region, ID } = req.session;
 
   try {
     await db.query(`
       INSERT INTO restaurants 
-      (name, license_number, contact_person, phone, email, address, zone, region, created_by)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `, [name, license_number, contact_person, phone, email, address, zone, region, ID]);
+      (name, license_number, contact_person, phone, email, address, zone, region, created_by, license_expiry)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, [name, license_number, contact_person, phone, email, address, zone, region, ID, license_expiry || null]);
 
     res.redirect('/inspector/restaurants/add?success=1');
   } catch (err) {
@@ -243,10 +243,10 @@ router.get('/inspector/restaurants/edit/:id', async (req, res) => {
 
 router.post('/inspector/restaurants/edit/:id', async (req, res) => {
 
-  const { name, license_number, contact_person, phone, email, address, region, status } = req.body;
+  const { name, license_number, contact_person, phone, email, address, region, status, license_expiry } = req.body;
   await db.query(
-    'UPDATE restaurants SET name=?, license_number=?, contact_person=?, phone=?, email=?, address=?, region=?, status=? WHERE id=?',
-    [name, license_number, contact_person, phone, email, address, region, status, req.params.id]
+    'UPDATE restaurants SET name=?, license_number=?, contact_person=?, phone=?, email=?, address=?, region=?, status=?, license_expiry=? WHERE id=?',
+    [name, license_number, contact_person, phone, email, address, region, status, license_expiry || null, req.params.id]
   );
   res.redirect('/inspector/restaurants');
 });
@@ -342,6 +342,8 @@ router.post('/inspection/submit/:id', upload.array('images'), async (req, res) =
   const hygieneScore = parseFloat(((totalChecked / 20) * 5).toFixed(2));
 
   try {
+    const hygieneScoreInput = formData.auto_score || hygieneScore; // Use auto_score if available
+
     await db.query(`
       INSERT INTO inspection_reports (
         inspection_id,
@@ -352,24 +354,32 @@ router.post('/inspection/submit/:id', upload.array('images'), async (req, res) =
         image_paths,
         latitude,
         longitude,
-        hygiene_score
+        hygiene_score,
+        auto_score
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `, [
       inspectionId,
       inspectorId,
       restaurantId,
       JSON.stringify(checklist),
       notes,
-      JSON.stringify(images), // Now stores Cloudinary URLs
+      JSON.stringify(images),
       latitude || null,
       longitude || null,
-      hygieneScore
+      hygieneScore,
+      hygieneScoreInput
     ]);
 
     await db.query(
       `UPDATE inspections SET status = 'Completed', last_inspection = NOW() WHERE id = ?`,
       [inspectionId]
+    );
+
+    // Update restaurant's central hygiene score to the new standardized auto-score
+    await db.query(
+      `UPDATE restaurants SET hygiene_score = ?, last_inspection_date = CURDATE() WHERE id = ?`,
+      [hygieneScoreInput, restaurantId]
     );
 
     res.redirect('/inspector/inspections/scheduled');

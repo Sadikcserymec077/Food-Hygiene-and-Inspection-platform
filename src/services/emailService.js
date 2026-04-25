@@ -3,41 +3,41 @@ const nodemailer = require('nodemailer');
 const hasSmtpConfig = !!(process.env.SMTP_USER && process.env.SMTP_PASS);
 
 const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.SMTP_PORT || '587'),
-    auth: {
-        user: process.env.SMTP_USER || 'dummy',
-        pass: process.env.SMTP_PASS || 'dummy'
-    }
+  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  port: parseInt(process.env.SMTP_PORT || '587'),
+  auth: {
+    user: process.env.SMTP_USER || 'dummy',
+    pass: process.env.SMTP_PASS || 'dummy'
+  }
 });
 
 const sendEmail = async (to, subject, htmlContent) => {
-    if (hasSmtpConfig) {
-        try {
-            await transporter.sendMail({
-                from: `"FSSAI Platform" <${process.env.SMTP_USER}>`,
-                to,
-                subject,
-                html: htmlContent
-            });
-            console.log(`✅ Email sent successfully to ${to}`);
-        } catch (err) {
-            console.error(`❌ Failed to send email to ${to}:`, err.message);
-        }
-    } else {
-        // ── FALLBACK FOR DEVELOPMENT / IF SMTP ISNT CONFIGURED ──
-        console.log(`\n================= 📧 MOCK EMAIL =================`);
-        console.log(`To: ${to}`);
-        console.log(`Subject: ${subject}`);
-        console.log(`Content:\n${htmlContent.replace(/<[^>]+>/g, '')}`); // stripping HTML for console view
-        console.log(`===================================================\n`);
+  if (hasSmtpConfig) {
+    try {
+      await transporter.sendMail({
+        from: `"FSSAI Platform" <${process.env.SMTP_USER}>`,
+        to,
+        subject,
+        html: htmlContent
+      });
+      console.log(`✅ Email sent successfully to ${to}`);
+    } catch (err) {
+      console.error(`❌ Failed to send email to ${to}:`, err.message);
     }
+  } else {
+    // ── FALLBACK FOR DEVELOPMENT / IF SMTP ISNT CONFIGURED ──
+    console.log(`\n================= 📧 MOCK EMAIL =================`);
+    console.log(`To: ${to}`);
+    console.log(`Subject: ${subject}`);
+    console.log(`Content:\n${htmlContent.replace(/<[^>]+>/g, '')}`); // stripping HTML for console view
+    console.log(`===================================================\n`);
+  }
 };
 
 module.exports = {
 
-    sendPasswordResetEmail: async (email, resetLink) => {
-        const html = `
+  sendPasswordResetEmail: async (email, resetLink) => {
+    const html = `
       <div style="font-family:Arial,sans-serif;max-width:500px;margin:auto;padding:20px;border:1px solid #eee;border-radius:10px;">
         <h2 style="color:#1d4ed8;">Password Reset Request</h2>
         <p>You requested a password reset for your FSSAI account.</p>
@@ -45,11 +45,11 @@ module.exports = {
         <p style="color:#6b7280;font-size:12px;">This link will expire in 15 minutes. Ignore if you didn't request this.</p>
       </div>
     `;
-        await sendEmail(email, '🔐 Reset Your Password', html);
-    },
+    await sendEmail(email, '🔐 Reset Your Password', html);
+  },
 
-    sendComplaintResolvedEmail: async (email, restaurantName, resolution) => {
-        const html = `
+  sendComplaintResolvedEmail: async (email, restaurantName, resolution) => {
+    const html = `
       <div style="font-family:Arial,sans-serif;max-width:500px;margin:auto;padding:20px;border:1px solid #10b981;border-radius:10px;">
         <h2 style="color:#047857;">Complaint Resolved</h2>
         <p>Your hygiene complaint against <strong>${restaurantName}</strong> has been investigated and resolved by an FSSAI Inspector.</p>
@@ -61,11 +61,11 @@ module.exports = {
         <p style="color:#6b7280;font-size:13px;">Thank you for helping us maintain public food safety standards.</p>
       </div>
     `;
-        await sendEmail(email, `✔️ Complaint Resolved: ${restaurantName}`, html);
-    },
+    await sendEmail(email, `✔️ Complaint Resolved: ${restaurantName}`, html);
+  },
 
-    sendInspectionScheduledEmail: async (email, inspectorName, restaurantName, date) => {
-        const html = `
+  sendInspectionScheduledEmail: async (email, inspectorName, restaurantName, date) => {
+    const html = `
       <div style="font-family:Arial,sans-serif;max-width:500px;margin:auto;padding:20px;border:1px solid #f59e0b;border-radius:10px;">
         <h2 style="color:#b45309;">New Inspection Assignment</h2>
         <p>Hello <strong>${inspectorName}</strong>,</p>
@@ -78,7 +78,23 @@ module.exports = {
         <p style="color:#6b7280;font-size:13px;">Please log into the Inspector Portal for detailed routing and evaluation criteria.</p>
       </div>
     `;
-        await sendEmail(email, `📅 Audit Scheduled: ${restaurantName}`, html);
-    }
+    await sendEmail(email, `📅 Audit Scheduled: ${restaurantName}`, html);
+  },
+
+  sendLicenseExpiryAlert: async (email, restaurantName, expiryDate) => {
+    const html = `
+      <div style="font-family:Arial,sans-serif;max-width:500px;margin:auto;padding:20px;border:1px solid #ef4444;border-radius:10px;">
+        <h2 style="color:#b91c1c;">⚠️ License Expiry Alert</h2>
+        <p>Your FSSAI hygiene license for <strong>${restaurantName}</strong> is scheduled to expire soon.</p>
+        <div style="background:#fef2f2;padding:15px;border-left:4px solid #ef4444;margin-top:15px;">
+          <p style="margin:0;color:#991b1b;"><strong>Expiry Date:</strong> ${expiryDate}</p>
+        </div>
+        <p>Please initiate the renewal process immediately to avoid heavy penalties or temporary suspension of operations.</p>
+        <br>
+        <p style="color:#6b7280;font-size:13px;">This is an automated sentinel alert from the FSSAI Monitoring Hub.</p>
+      </div>
+    `;
+    await sendEmail(email, `⚠️ URGENT: License Expiring for ${restaurantName}`, html);
+  }
 
 };

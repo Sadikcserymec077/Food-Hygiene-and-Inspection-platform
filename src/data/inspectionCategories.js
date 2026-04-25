@@ -33,6 +33,14 @@ const checklistSchema = {
   }
 };
 
+const checklistWeights = {
+  personalHygiene: { handsClean: 5, uniformClean: 2, hairCovered: 2, noJewelry: 1 },
+  premisesCleanliness: { floorsClean: 3, wallsClean: 2, ceilingsClean: 1, tablesClean: 4 },
+  foodStorage: { temperatureControlled: 10, separateRawCooked: 8, properLabeling: 4, noExpiredItems: 8 },
+  equipment: { cleanUtensils: 3, workingRefrigeration: 7, properSanitization: 4, maintenanceUpToDate: 1 },
+  wasteManagement: { properDisposal: 5, coveredBins: 3, regularCollection: 2, pestControl: 10 }
+};
+
 const sectionLabels = {
   personalHygiene: 'Personal Hygiene',
   premisesCleanliness: 'Premises Cleanliness',
@@ -43,5 +51,6 @@ const sectionLabels = {
 
 module.exports = {
   checklistSchema,
+  checklistWeights,
   sectionLabels
 };

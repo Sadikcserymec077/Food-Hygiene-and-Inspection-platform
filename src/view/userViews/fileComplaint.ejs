@@ -170,6 +170,14 @@
         const ctx = canvas.getContext('2d');
         ctx.drawImage(cameraStream, 0, 0, canvas.width, canvas.height);
 
+        // --- Phase 8: Image Quality Guardrail ---
+        const quality = ImageQualityGuard.analyze(canvas);
+        if (!quality.isGood) {
+          if (!confirm(`${quality.reason}\n\nDo you want to keep this photo anyway?`)) {
+            return; // Cancel capture
+          }
+        }
+
         canvas.toBlob(blob => {
           const file = new File([blob], `complaint_snapshot_${Date.now()}.jpg`, { type: 'image/jpeg' });
           capturedFiles.push(file);
@@ -182,6 +190,7 @@
         }, 'image/jpeg', 0.9);
       });
     </script>
+    <script src="/js/imageQualityGuard.js"></script>
 </body>
 
 </html>

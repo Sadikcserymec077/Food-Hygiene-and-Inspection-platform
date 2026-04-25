@@ -31,6 +31,29 @@ const db = mysql.createPool({
       )
     `);
 
+    // --- Phase 8 Schema Provisioning ---
+
+    // 1. Complaints AI Metadata
+    const [compCols] = await connection.query("SHOW COLUMNS FROM complaints LIKE 'ai_category'");
+    if (compCols.length === 0) {
+      await connection.query(`ALTER TABLE complaints ADD COLUMN ai_category VARCHAR(100) DEFAULT 'unclassified', ADD COLUMN ai_severity INT DEFAULT 0`);
+      console.log('✅ Added AI columns to complaints table.');
+    }
+
+    // 2. Restaurants License Expiry
+    const [restCols] = await connection.query("SHOW COLUMNS FROM restaurants LIKE 'license_expiry'");
+    if (restCols.length === 0) {
+      await connection.query(`ALTER TABLE restaurants ADD COLUMN license_expiry DATE DEFAULT NULL`);
+      console.log('✅ Added license_expiry to restaurants table.');
+    }
+
+    // 3. Inspection Reports Auto-Score
+    const [repCols] = await connection.query("SHOW COLUMNS FROM inspection_reports LIKE 'auto_score'");
+    if (repCols.length === 0) {
+      await connection.query(`ALTER TABLE inspection_reports ADD COLUMN auto_score DECIMAL(3,2) DEFAULT 0.00`);
+      console.log('✅ Added auto_score to inspection_reports table.');
+    }
+
     connection.release();
   } catch (error) {
     console.error('❌ MySQL connection failed:', error);
