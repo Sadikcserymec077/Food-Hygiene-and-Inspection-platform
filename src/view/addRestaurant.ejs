@@ -38,61 +38,190 @@
             <p class="subtitle">Fill in the restaurant information. It will be submitted for admin approval.</p>
 
             <form action="/inspector/restaurants/add" method="POST" class="add-form">
-              <div class="form-grid">
-                <div>
-                  <label for="name">Restaurant Name *</label>
-                  <input type="text" name="name" required placeholder="Enter restaurant name" />
-                </div>
-                <div>
-                  <label for="license_number">License Number *</label>
-                  <input type="text" name="license_number" required placeholder="LIC-XXXXX" />
-                </div>
-                <div>
-                  <label for="contact_person">Contact Person *</label>
-                  <input type="text" name="contact_person" required placeholder="Owner/Manager name" />
-                </div>
-                <div>
-                  <label for="phone">Phone Number *</label>
-                  <input type="text" name="phone" required placeholder="+91-XXXXXXXXXX" />
-                </div>
-                <div>
-                  <label for="email">Email Address</label>
-                  <input type="email" name="email" placeholder="restaurant@example.com" />
-                </div>
-              </div>
-
-              <div class="textarea-section">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                  <label for="address" style="margin-bottom: 0;">Complete Address *</label>
-                  <button type="button" id="gpsAutoFillBtn"
-                    style="background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 6px;">
-                    <i data-lucide="map-pin" style="width: 14px; height: 14px;"></i> Use Current Location
+              <!-- Smart Search Section -->
+              <div
+                style="grid-column: span 2; margin-bottom: 12px; background: #f8fafc; padding: 16px; border-radius: 12px; border: 1px dashed #cbd5e1;">
+                <label style="color: #6366f1; font-weight: bold; display: flex; align-items: center; gap: 6px;">
+                  <i data-lucide="zap" style="width: 16px; height: 16px;"></i> Smart Restaurant Autocomplete
+                </label>
+                <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 10px;">Type a name or look for real
+                  establishments nearby to auto-fill details.</p>
+                <div style="position: relative; display: flex; gap: 8px;">
+                  <input type="text" id="smartSearchInput"
+                    placeholder="🔍 Search real restaurants (e.g. KFC, Starbucks...)"
+                    style="flex: 1; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem;" />
+                  <button type="button" id="scanNearbyBtn"
+                    style="background: #6366f1; color: white; border: none; padding: 0 16px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: bold; font-size: 0.85rem;">
+                    <i data-lucide="map" style="width: 16px; height: 16px;"></i> Scan Nearby
                   </button>
+                  <div id="smartSearchResults"
+                    style="display: none; position: absolute; top: 50px; left: 0; width: 100%; background: white; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 100; max-height: 250px; overflow-y: auto;">
+                  </div>
                 </div>
-                <textarea name="address" id="addressTextarea" rows="3" required
-                  placeholder="Enter complete address"></textarea>
               </div>
 
-              <div class="assignment-info">
-                <strong>Assignment Details</strong>
-                <p>Zone: <%= zone %>
-                </p>
-                <p>Region: <%= region %>
-                </p>
-                <p>Inspector: <%= inspectorName %>
-                </p>
+              <div>
+                <label for="name">Restaurant Name *</label>
+                <input type="text" name="name" id="nameInput" required placeholder="Enter restaurant name" />
               </div>
-
-              <div class="form-actions">
-                <a href="/inspector/dashboard" class="btn-outline">Cancel</a>
-                <button type="submit" class="btn-black">Add Restaurant</button>
+              <div>
+                <label for="license_number">License Number *</label>
+                <input type="text" name="license_number" required placeholder="LIC-XXXXX" />
               </div>
-            </form>
+              <div>
+                <label for="contact_person">Contact Person *</label>
+                <input type="text" name="contact_person" required placeholder="Owner/Manager name" />
+              </div>
+              <div>
+                <label for="phone">Phone Number *</label>
+                <input type="text" name="phone" required placeholder="+91-XXXXXXXXXX" />
+              </div>
+              <div>
+                <label for="email">Email Address</label>
+                <input type="email" name="email" placeholder="restaurant@example.com" />
+              </div>
           </div>
+
+          <div class="textarea-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <label for="address" style="margin-bottom: 0;">Complete Address *</label>
+              <button type="button" id="gpsAutoFillBtn"
+                style="background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                <i data-lucide="map-pin" style="width: 14px; height: 14px;"></i> Use Current Location
+              </button>
+            </div>
+            <textarea name="address" id="addressTextarea" rows="3" required
+              placeholder="Enter complete address"></textarea>
+          </div>
+
+          <div class="assignment-info">
+            <strong>Assignment Details</strong>
+            <p>Zone: <%= zone %>
+            </p>
+            <p>Region: <%= region %>
+            </p>
+            <p>Inspector: <%= inspectorName %>
+            </p>
+          </div>
+
+          <div class="form-actions">
+            <a href="/inspector/dashboard" class="btn-outline">Cancel</a>
+            <button type="submit" class="btn-black">Add Restaurant</button>
+          </div>
+          </form>
+    </div>
     </div>
 
     <script>
       lucide.createIcons();
+
+      // Smart Search / Autocomplete Logic
+      const smartSearchInput = document.getElementById('smartSearchInput');
+      const smartSearchResults = document.getElementById('smartSearchResults');
+      const nameInput = document.getElementById('nameInput');
+      const addressTextarea = document.getElementById('addressTextarea');
+      let searchTimeout;
+
+      smartSearchInput.addEventListener('input', () => {
+        clearTimeout(searchTimeout);
+        const query = smartSearchInput.value.trim();
+        if (query.length < 3) {
+          smartSearchResults.style.display = 'none';
+          return;
+        }
+
+        searchTimeout = setTimeout(async () => {
+          // Get current location if possible to prioritize nearby results
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(pos => {
+              fetchResults(query, pos.coords.latitude, pos.coords.longitude);
+            }, () => fetchResults(query));
+          } else {
+            fetchResults(query);
+          }
+        }, 500);
+      });
+
+      document.getElementById('scanNearbyBtn').addEventListener('click', () => {
+        const btn = document.getElementById('scanNearbyBtn');
+        btn.innerHTML = `<i data-lucide="loader" class="lucide-icon spin" style="width: 16px; height: 16px;"></i> Scan...`;
+        lucide.createIcons();
+
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(async pos => {
+            const lat = pos.coords.latitude;
+            const lon = pos.coords.longitude;
+            // Overpass-like bounding box search or Nominatim reverse-search logic
+            let url = `https://nominatim.openstreetmap.org/search?q=restaurant&format=json&addressdetails=1&limit=10&bounded=1&viewbox=${lon - 0.01},${lat + 0.01},${lon + 0.01},${lat - 0.01}`;
+
+            try {
+              const response = await fetch(url, { headers: { 'User-Agent': 'FoodHygieneApp/1.0' } });
+              const data = await response.json();
+              renderResults(data);
+              btn.innerHTML = `<i data-lucide="map" style="width: 16px; height: 16px;"></i> Scan Nearby`;
+            } catch (e) {
+              btn.innerHTML = `<i data-lucide="map" style="width: 16px; height: 16px;"></i> Scan Nearby`;
+            }
+            lucide.createIcons();
+          }, () => {
+            alert("Please enable location to scan nearby restaurants.");
+            btn.innerHTML = `<i data-lucide="map" style="width: 16px; height: 16px;"></i> Scan Nearby`;
+            lucide.createIcons();
+          });
+        }
+      });
+
+      async function fetchResults(query, lat, lon) {
+        let url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}+restaurant&format=json&addressdetails=1&limit=6`;
+        if (lat && lon) {
+          // Prioritize results near the user
+          url += `&viewbox=${lon - 0.1},${lat + 0.1},${lon + 0.1},${lat - 0.1}&bounded=0`;
+        }
+
+        const response = await fetch(url, {
+          headers: { 'User-Agent': 'FoodHygieneApp/1.0' }
+        });
+        const data = await response.json();
+        renderResults(data);
+      }
+
+      function renderResults(data) {
+        smartSearchResults.innerHTML = '';
+        if (data.length === 0) {
+          smartSearchResults.innerHTML = '<div style="padding: 12px; color: #94a3b8;">No real establishments found.</div>';
+        } else {
+          data.forEach(item => {
+            const div = document.createElement('div');
+            div.style.padding = '12px';
+            div.style.borderBottom = '1px solid #f1f5f9';
+            div.style.cursor = 'pointer';
+            div.style.transition = 'background 0.2s';
+            div.className = 'search-item';
+            div.innerHTML = `
+              <div style="font-weight: bold; color: #1e293b;">${item.display_name.split(',')[0]}</div>
+              <div style="font-size: 0.75rem; color: #64748b;">${item.display_name}</div>
+            `;
+            div.onmouseover = () => div.style.background = '#f8fafc';
+            div.onmouseout = () => div.style.background = 'transparent';
+
+            div.onclick = () => {
+              nameInput.value = item.display_name.split(',')[0];
+              addressTextarea.value = item.display_name;
+              smartSearchResults.style.display = 'none';
+              smartSearchInput.value = item.display_name.split(',')[0];
+            };
+            smartSearchResults.appendChild(div);
+          });
+        }
+        smartSearchResults.style.display = 'block';
+      }
+
+      // Close results when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!smartSearchInput.contains(e.target) && !smartSearchResults.contains(e.target)) {
+          smartSearchResults.style.display = 'none';
+        }
+      });
 
       document.getElementById('gpsAutoFillBtn').addEventListener('click', function () {
         const btn = this;
