@@ -8,10 +8,26 @@ const session = require('express-session');
 app.set('trust proxy', 1);
 
 
+const MySQLStore = require('express-mysql-session')(session);
+
+const sessionStore = new MySQLStore({
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT || 3306,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME,
+  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
+  createDatabaseTable: true,
+  clearExpired: true,
+  checkExpirationInterval: 900000,
+  expiration: 86400000
+});
+
 app.use(session({
   secret: process.env.SESSION_SECRET || 'kldsfjbvkaelugivdbsbvhi',
   resave: false,
   saveUninitialized: false,
+  store: sessionStore,
   cookie: {
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
