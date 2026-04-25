@@ -6,43 +6,43 @@ const fs = require('fs');
 
 const { checklistSchema, sectionLabels } = require('../data/inspectionCategories');
 
-router.get('/userLogin',(req,res)=>{
-    res.render('userViews/userLogin');
-  })
+router.get('/userLogin', (req, res) => {
+  res.render('userViews/userLogin');
+})
 
 
-router.get('/userSignup',(req,res)=>{
-    res.render('userViews/userSignup');
-  })
+router.get('/userSignup', (req, res) => {
+  res.render('userViews/userSignup');
+})
 
 
 
-  router.post('/userSignup', async (req, res) => {
-    const { name, email, phone, password } = req.body;
-  
-    if (!name || !email || !phone || !password) {
-      return res.render('userViews/userSignup', { error: 'All fields are required!' });
+router.post('/userSignup', async (req, res) => {
+  const { name, email, phone, password } = req.body;
+
+  if (!name || !email || !phone || !password) {
+    return res.render('userViews/userSignup', { error: 'All fields are required!' });
+  }
+
+  try {
+    // Check if email already exists
+    const [existing] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
+    if (existing.length > 0) {
+      return res.render('userViews/userSignup', { error: 'Email already registered!' });
     }
-    
-    try {
-      // Check if email already exists
-      const [existing] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
-      if (existing.length > 0) {
-        return res.render('userViews/userSignup', { error: 'Email already registered!' });
-      }
-    
-      // Plain password (not recommended in production!)
-      await db.query('INSERT INTO users (name, email, phone, password) VALUES (?, ?, ?, ?)', 
-        [name, email, phone, password]);
-    
-      res.redirect('userLogin'); // Redirect to login upon success
-      
-    } catch (err) {
-      console.error(err);
-      res.render('userViews/userSignup', { error: 'Signup failed. Please try again!' });
-    }
-  });
-  
+
+    // Plain password (not recommended in production!)
+    await db.query('INSERT INTO users (name, email, phone, password) VALUES (?, ?, ?, ?)',
+      [name, email, phone, password]);
+
+    res.redirect('userLogin'); // Redirect to login upon success
+
+  } catch (err) {
+    console.error(err);
+    res.render('userViews/userSignup', { error: 'Signup failed. Please try again!' });
+  }
+});
+
 router.post('/userLogin', async (req, res) => {
   const { email, password } = req.body;
 
@@ -58,7 +58,7 @@ router.post('/userLogin', async (req, res) => {
     }
 
     req.session.Name = results[0].name;
-    req.session.email=results[0].email;
+    req.session.email = results[0].email;
     res.redirect('user/dashboard');
   } catch (err) {
     console.error("Database error:", err);
@@ -74,7 +74,7 @@ router.get('/user/dashboard', async (req, res) => {
 
   const user = {
     id: req.session.email,
-    name:req.session.Name
+    name: req.session.Name
   };
 
   try {
@@ -279,43 +279,42 @@ router.get('/user/restaurant/:id', async (req, res) => {
     let reportData = {};
     let imageUrls = [];
 
-    if (restaurant.insp_rep_id) {
-      const [[r]] = await db.query(`
-        SELECT ir.*, ins.name AS inspector_name
-        FROM inspection_reports ir
-        JOIN inspectors ins ON ins.id = ir.inspector_id
-        WHERE ir.id = ?
-      `, [restaurant.insp_rep_id]);
+    // Fetch latest approved report for this restaurant (fallback to any report)
+    const [[r]] = await db.query(`
+      SELECT ir.*, ins.name AS inspector_name
+      FROM inspection_reports ir
+      JOIN inspectors ins ON ins.id = ir.inspector_id
+      WHERE ir.restaurant_id = ?
+      ORDER BY FIELD(ir.status, 'approved', 'pending', 'rejected'), ir.submitted_at DESC
+      LIMIT 1
+    `, [restaurantId]);
 
-      if (r) {
-        // Parse JSON fields
-        try {
-          reportData = typeof r.report_json === 'string' ? JSON.parse(r.report_json) : r.report_json;
-        } catch (e) {
-          console.error('Invalid JSON in report_json:', e.message);
-        }
-
-        try {
-          imageUrls = typeof r.image_paths === 'string' ? JSON.parse(r.image_paths) : r.image_paths || [];
-        } catch (e) {
-          console.error('Invalid JSON in image_paths:', e.message);
-        }
-
-        const hygieneScore = parseFloat(r.hygiene_score);
-        scoreColor = hygieneScore >= 4 ? 'green' : hygieneScore >= 3 ? 'orange' : 'red';
-
-        report = {
-          ...r,
-          hygiene_score: hygieneScore,
-          report_data: reportData,
-          image_urls: imageUrls
-        };
-
-        inspector = {
-          name: r.inspector_name
-        };
+    if (r) {
+      try {
+        reportData = typeof r.report_json === 'string' ? JSON.parse(r.report_json) : r.report_json;
+      } catch (e) {
+        console.error('Invalid JSON in report_json:', e.message);
       }
+
+      try {
+        imageUrls = typeof r.image_paths === 'string' ? JSON.parse(r.image_paths) : r.image_paths || [];
+      } catch (e) {
+        console.error('Invalid JSON in image_paths:', e.message);
+      }
+
+      const hygieneScore = parseFloat(r.hygiene_score);
+      scoreColor = hygieneScore >= 4 ? 'green' : hygieneScore >= 3 ? 'orange' : 'red';
+
+      report = {
+        ...r,
+        hygiene_score: hygieneScore,
+        report_data: reportData,
+        image_urls: imageUrls
+      };
+
+      inspector = { name: r.inspector_name };
     }
+
 
     res.render('userViews/viewRestaurant', {
       restaurant,
