@@ -1,49 +1,48 @@
-const pdf = require('html-pdf');
-const fs = require('fs');
+const puppeteer = require('puppeteer');
 const path = require('path');
 const ejs = require('ejs');
 const { checklistSchema, sectionLabels } = require('../data/inspectionCategories');
 
 class PDFService {
   static async generateInspectionReportPDF(reportData) {
-    return new Promise((resolve, reject) => {
-      // Read the HTML template
-      const templatePath = path.join(__dirname, '../view/templates/reportTemplate.ejs');
-      const htmlTemplate = fs.readFileSync(templatePath, 'utf8');
-      
-      // Render the template with data
-      const renderedHTML = ejs.render(htmlTemplate, {
-        ...reportData,
-        checklistSchema,
-        sectionLabels,
-        scoreColor: this.getScoreColor(reportData.report.hygiene_score)
-      });
+    const templatePath = path.join(__dirname, '../view/templates/reportTemplate.ejs');
 
-      const options = {
+    const renderedHTML = await ejs.renderFile(templatePath, {
+      ...reportData,
+      checklistSchema,
+      sectionLabels,
+      scoreColor: this.getScoreColor(reportData.report.hygiene_score)
+    });
+
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-gpu'
+      ]
+    });
+
+    try {
+      const page = await browser.newPage();
+      await page.setContent(renderedHTML, { waitUntil: 'networkidle0' });
+
+      const pdfBuffer = await page.pdf({
         format: 'A4',
-        border: {
+        margin: {
           top: '20mm',
           right: '10mm',
           bottom: '20mm',
           left: '10mm'
         },
-        header: {
-          height: '15mm',
-          contents: '<div style="text-align: center; font-size: 10px;">Food Hygiene Inspection Report</div>'
-        },
-        footer: {
-          height: '15mm',
-          contents: {
-            default: '<div style="text-align: center; font-size: 10px; color: #666;">Page {{page}} of {{pages}}</div>'
-          }
-        }
-      };
-
-      pdf.create(renderedHTML, options).toBuffer((err, buffer) => {
-        if (err) return reject(err);
-        resolve(buffer);
+        printBackground: true
       });
-    });
+
+      return pdfBuffer;
+    } finally {
+      await browser.close();
+    }
   }
 
   static getScoreColor(score) {
