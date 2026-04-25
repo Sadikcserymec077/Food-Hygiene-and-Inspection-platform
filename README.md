@@ -14,7 +14,9 @@ The platform serves **four roles**: Super Admin, Admin, Inspector, and Public Us
 
 ## 🌐 Live Demo
 
-> 🚧 Coming soon — deployment in progress.
+**[https://food-hygiene-and-inspection-platform.onrender.com](https://food-hygiene-and-inspection-platform.onrender.com)**
+
+> ⚠️ Hosted on Render free tier — first load may take ~30 seconds to wake up.
 
 ---
 
