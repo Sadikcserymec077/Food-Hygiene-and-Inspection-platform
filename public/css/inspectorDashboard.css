@@ -59,7 +59,8 @@ body {
 .lucide-icon {
   width: 36px;
   height: 36px;
-  color: var(--black); /* ✅ ICON COLOR BLACK */
+  color: var(--black);
+  /* ✅ ICON COLOR BLACK */
 }
 
 /* === Stats === */
@@ -74,7 +75,7 @@ body {
   background-color: white;
   padding: 20px;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -118,7 +119,7 @@ body {
   padding: 24px;
   border-radius: 12px;
   background-color: white;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   transition: transform 0.2s ease;
   min-height: 120px;
   text-decoration: none;
@@ -146,17 +147,32 @@ body {
   margin-right: 16px;
 }
 
-.blue-bg { background-color: var(--blue-light); color: var(--blue); }
-.green-bg { background-color: var(--green-light); color: var(--green); }
-.orange-bg { background-color: var(--orange-light); color: var(--orange); }
-.purple-bg { background-color: var(--purple-light); color: var(--purple); }
+.blue-bg {
+  background-color: var(--blue-light);
+  color: var(--blue);
+}
+
+.green-bg {
+  background-color: var(--green-light);
+  color: var(--green);
+}
+
+.orange-bg {
+  background-color: var(--orange-light);
+  color: var(--orange);
+}
+
+.purple-bg {
+  background-color: var(--purple-light);
+  color: var(--purple);
+}
 
 /* === Today’s Inspections Section (Styled Card) === */
 .today-card {
   background-color: white;
   padding: 24px;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   margin-top: 50px;
 }
 
@@ -188,7 +204,8 @@ body {
   justify-content: space-between;
   align-items: center;
   background-color: var(--gray-light);
-  padding: 12px 16px; /* ✅ REDUCED HEIGHT */
+  padding: 12px 16px;
+  /* ✅ REDUCED HEIGHT */
   border-radius: 10px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
   transition: transform 0.2s ease;
@@ -230,13 +247,15 @@ body {
   flex-shrink: 0;
   width: 26px;
   height: 26px;
-  color: var(--black); /* ✅ BLACK ICONS */
+  color: var(--black);
+  /* ✅ BLACK ICONS */
 }
 
 /* === Buttons === */
 .btn {
   padding: 10px 22px;
-  background-color: #111; /* ✅ black */
+  background-color: #111;
+  /* ✅ black */
   color: white;
   font-weight: 600;
   border: none;
@@ -248,12 +267,14 @@ body {
 
 
 .btn:hover {
-  background-color: #000; /* darker black on hover */
+  background-color: #000;
+  /* darker black on hover */
 }
 
 
 .btn-small {
-  padding: 10px 22px; /* ✅ WIDER + TALLER */
+  padding: 10px 22px;
+  /* ✅ WIDER + TALLER */
   font-size: 0.9rem;
 }
 
@@ -269,4 +290,31 @@ body {
   height: 40px;
   color: #9ca3af;
   margin-bottom: 10px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 20px 15px;
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .actions-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .activity-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .btn-small {
+    width: 100%;
+    text-align: center;
+  }
 }

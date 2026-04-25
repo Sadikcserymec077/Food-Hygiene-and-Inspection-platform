@@ -193,8 +193,24 @@ body {
     align-items: center;
   }
 
+  .nav-wrapper {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .nav-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
+
   .nav-links a {
-    margin-left: 16px;
+    margin-left: 0;
+  }
+
+  .hero {
+    padding: 60px 15px;
   }
 
   .hero h1 {

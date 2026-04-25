@@ -48,7 +48,7 @@ body {
   background-color: white;
   padding: 30px;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .card h2 {
@@ -158,4 +158,33 @@ input {
 .lucide-icon {
   height: 20px;
   width: 20px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .add-container {
+    padding: 10px;
+    margin: 20px auto;
+  }
+
+  .card {
+    padding: 15px;
+  }
+
+  .add-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .form-actions button,
+  .form-actions a {
+    width: 100%;
+    text-align: center;
+  }
 }

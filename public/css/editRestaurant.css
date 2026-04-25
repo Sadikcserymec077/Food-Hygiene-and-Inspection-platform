@@ -4,7 +4,8 @@
   --border: #e5e7eb;
   --bg-light: #f9fafb;
   --white: #fff;
-  --readonly-bg: #f3f4f6; /* New color for readonly fields */
+  --readonly-bg: #f3f4f6;
+  /* New color for readonly fields */
 }
 
 /* Base */
@@ -22,7 +23,7 @@ body {
   background: var(--white);
   padding: 30px 40px;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 /* Header */
@@ -132,4 +133,23 @@ body {
 .btn-outline:hover {
   background-color: var(--black);
   color: white;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .form-wrapper {
+    padding: 20px 15px;
+    margin: 20px 10px;
+  }
+
+  .form-footer {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .form-footer a,
+  .form-footer button {
+    width: 100%;
+    text-align: center;
+  }
 }

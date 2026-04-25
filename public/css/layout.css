@@ -207,6 +207,14 @@ body {
   .menu-toggle {
     display: block;
   }
+  
+  .main-content {
+    padding: 20px;
+  }
+  
+  .header-bar .container {
+    padding: 0 15px;
+  }
 }
 
 
