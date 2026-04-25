@@ -1,0 +1,13 @@
+{
+    "watch": [
+        "src",
+        "index.js",
+        "chatbotRoute.js"
+    ],
+    "ext": "js,mjs,cjs,json,ejs",
+    "ignore": [
+        "node_modules",
+        "public"
+    ],
+    "delay": "1000"
+}
