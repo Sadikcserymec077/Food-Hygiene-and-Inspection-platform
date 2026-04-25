@@ -149,23 +149,20 @@
                   <video id="camera-stream" autoplay playsinline
                     style="width: 100%; height: auto; display: block;"></video>
                   <button type="button" id="webrtc-capture-btn"
-                    style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: #ef4444; color: white; border: 4px solid rgba(255,255,255,0.4); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
+                    style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: #ef4444; color: white; border: 4px solid rgba(255,255,255,0.4); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.5); z-index: 10;">
                     <i data-lucide="camera" style="width: 24px; height: 24px;"></i>
                   </button>
                   <button type="button" id="webrtc-close-btn"
-                    style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.5); color: white; border: none; padding: 8px; border-radius: 8px; cursor: pointer;">
-                    X
+                    style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.5); color: white; border: none; padding: 8px; border-radius: 8px; cursor: pointer; z-index: 10;">
+                    Done
                   </button>
                 </div>
 
                 <canvas id="camera-canvas" style="display: none;"></canvas>
 
-                <div id="camera-preview" style="display: none; margin-top: 16px; text-align: center;">
-                  <img id="preview-img"
-                    style="width: 100%; max-width: 400px; border-radius: 8px; border: 2px solid #10b981;" />
-                  <p style="color: #10b981; font-weight: bold; margin-top: 8px;">✅ Image Captured!</p>
-                  <button type="button" id="webrtc-retake-btn" class="btn outline" style="margin-top: 8px;">Retake
-                    Photo</button>
+                <!-- Thumbnail Gallery -->
+                <div id="camera-gallery"
+                  style="display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; margin-top: 16px;">
                 </div>
 
                 <input type="file" name="images" id="cameraInput" multiple accept="image/*" style="display: none;" />
@@ -205,11 +202,10 @@
       const closeBtn = document.getElementById('webrtc-close-btn');
       const canvas = document.getElementById('camera-canvas');
       const cameraInput = document.getElementById('cameraInput');
-      const cameraPreview = document.getElementById('camera-preview');
-      const previewImg = document.getElementById('preview-img');
-      const retakeBtn = document.getElementById('webrtc-retake-btn');
+      const gallery = document.getElementById('camera-gallery');
 
       let mediaStream = null;
+      let capturedFiles = [];
 
       async function startCamera() {
         try {
@@ -217,7 +213,6 @@
           cameraStream.srcObject = mediaStream;
           liveCameraModule.style.display = 'block';
           openLiveCameraBtn.style.display = 'none';
-          cameraPreview.style.display = 'none';
         } catch (err) {
           alert('Could not access camera. Please check your browser permissions.');
           console.error(err);
@@ -233,9 +228,54 @@
         openLiveCameraBtn.style.display = 'block';
       }
 
+      function updateFileInput() {
+        const dt = new DataTransfer();
+        capturedFiles.forEach(file => dt.items.add(file));
+        cameraInput.files = dt.files;
+      }
+
+      function addThumbnail(file) {
+        const wrapper = document.createElement('div');
+        wrapper.style.position = 'relative';
+
+        const img = document.createElement('img');
+        img.src = URL.createObjectURL(file);
+        img.style.width = '100%';
+        img.style.height = '80px';
+        img.style.objectFit = 'cover';
+        img.style.borderRadius = '8px';
+        img.style.border = '1px solid #e2e8f0';
+
+        const removeBtn = document.createElement('button');
+        removeBtn.innerHTML = '×';
+        removeBtn.style.position = 'absolute';
+        removeBtn.style.top = '-5px';
+        removeBtn.style.right = '-5px';
+        removeBtn.style.background = '#ef4444';
+        removeBtn.style.color = 'white';
+        removeBtn.style.border = 'none';
+        removeBtn.style.borderRadius = '50%';
+        removeBtn.style.width = '20px';
+        removeBtn.style.height = '20px';
+        removeBtn.style.display = 'flex';
+        removeBtn.style.alignItems = 'center';
+        removeBtn.style.justifyContent = 'center';
+        removeBtn.style.cursor = 'pointer';
+        removeBtn.style.fontSize = '14px';
+
+        removeBtn.onclick = () => {
+          capturedFiles = capturedFiles.filter(f => f !== file);
+          updateFileInput();
+          wrapper.remove();
+        };
+
+        wrapper.appendChild(img);
+        wrapper.appendChild(removeBtn);
+        gallery.appendChild(wrapper);
+      }
+
       openLiveCameraBtn.addEventListener('click', startCamera);
       closeBtn.addEventListener('click', stopCamera);
-      retakeBtn.addEventListener('click', startCamera);
 
       captureBtn.addEventListener('click', () => {
         canvas.width = cameraStream.videoWidth;
@@ -245,14 +285,13 @@
 
         canvas.toBlob(blob => {
           const file = new File([blob], `inspection_snapshot_${Date.now()}.jpg`, { type: 'image/jpeg' });
-          const dt = new DataTransfer();
-          dt.items.add(file);
-          cameraInput.files = dt.files;
+          capturedFiles.push(file);
+          updateFileInput();
+          addThumbnail(file);
 
-          previewImg.src = URL.createObjectURL(blob);
-          stopCamera();
-          cameraPreview.style.display = 'block';
-          openLiveCameraBtn.style.display = 'none';
+          // Visual feedback
+          captureBtn.style.background = '#10b981';
+          setTimeout(() => captureBtn.style.background = '#ef4444', 300);
         }, 'image/jpeg', 0.9);
       });
     </script>
