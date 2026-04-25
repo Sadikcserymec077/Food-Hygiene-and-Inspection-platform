@@ -3,7 +3,7 @@ const express = require('express');
 const app = express();
 const db = require('./src/config/dbConnect');
 const session = require('express-session');
-    
+
 app.use(session({
   secret: 'kldsfjbvkaelugivdbsbvhi',
   resave: false,
@@ -48,7 +48,7 @@ const userRoutes = require("./src/routes/userRoutes");
 app.use(userRoutes);
 
 const superAdminRoutes = require("./src/routes/superAdminRoutes");
-app.use( superAdminRoutes);
+app.use(superAdminRoutes);
 
 // Routes
 app.get('/', (req, res) => res.render('home1'));
@@ -63,7 +63,7 @@ app.get('/logout', (req, res) => {
 });
 
 app.get('/getGeoLocation', (req, res) => res.render('geoLocation'));
-app.locals.formatLabel = function(key) {
+app.locals.formatLabel = function (key) {
   return key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
 };
 // app.use('/uploads', express.static('D:/images'));
@@ -77,7 +77,7 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
