@@ -1,7 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/dbConnect');
-const upload = require('../config/multer');
+const { storage } = require('../config/cloudinary');
+const multer = require('multer');
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 10 * 1024 * 1024 }
+});
 const fs = require('fs');
 
 const { checklistSchema, sectionLabels } = require('../data/inspectionCategories');
@@ -196,11 +201,21 @@ router.get('/user/complaints', async (req, res) => {
       ORDER BY c.created_at DESC
     `, [userId]);
 
-    // ✅ Parse the 'images' field (stored as JSON string in DB)
-    const complaints = complaintsRaw.map(c => ({
-      ...c,
-      images: c.images ? JSON.parse(c.images) : []  // safely parse
-    }));
+    // ✅ Parse the 'images' field (stored as JSON string in DB) safely
+    const complaints = complaintsRaw.map(c => {
+      let parsedImages = [];
+      if (c.images) {
+        try {
+          parsedImages = typeof c.images === 'string' ? JSON.parse(c.images) : c.images;
+        } catch (e) {
+          console.error("Failed to parse complaint images:", e);
+        }
+      }
+      return {
+        ...c,
+        images: parsedImages
+      };
+    });
 
     res.render('userViews/complaints', { complaints, restaurants });
   } catch (err) {
@@ -239,7 +254,10 @@ router.post('/user/complaint/:id', upload.array('images', 5), async (req, res) =
     const { subject, description, anonymous } = req.body;
     const userId = req.session.email;
 
-    const imagePaths = req.files.map(file => file.filename); // store filenames only
+    // ✅ Safely extract Cloudinary URLs instead of local filenames
+    const imagePaths = req.files && req.files.length > 0
+      ? req.files.map(file => file.path)
+      : [];
 
     await db.query(
       `INSERT INTO complaints 
