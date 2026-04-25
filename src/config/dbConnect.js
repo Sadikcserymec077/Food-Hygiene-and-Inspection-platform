@@ -18,6 +18,19 @@ const db = mysql.createPool({
   try {
     const connection = await db.getConnection();
     console.log('✅ MySQL connection established successfully.');
+
+    // Auto-provision the owners table needed for Phase 5
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS owners (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
+        email VARCHAR(100) UNIQUE NOT NULL,
+        phone VARCHAR(20),
+        password VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     connection.release();
   } catch (error) {
     console.error('❌ MySQL connection failed:', error);

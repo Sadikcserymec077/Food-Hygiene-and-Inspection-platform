@@ -10,7 +10,8 @@ const BASE_URL = process.env.BASE_URL || 'http://localhost:5000';
 const ROLE_TABLE = {
     user: { table: 'users', loginPage: '/userLogin' },
     inspector: { table: 'inspectors', loginPage: '/inspectorLogin' },
-    admin: { table: 'admins', loginPage: '/adminLogin' }
+    admin: { table: 'admins', loginPage: '/adminLogin' },
+    owner: { table: 'owners', loginPage: '/ownerLogin' }
 };
 
 // ─── GET  /forgot-password  (show the form) ──────────────────────────

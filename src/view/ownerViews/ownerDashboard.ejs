@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Owner Dashboard – FSSAI Platform</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/adminDashboard.css" />
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="logo">
+            <i data-lucide="store" style="color: #ec4899;"></i>
+            <span>Owner Portal</span>
+        </div>
+
+        <nav>
+            <ul>
+                <li><a href="/owner/dashboard" class="active"><i data-lucide="layout-dashboard"></i>
+                        <span>Dashboard</span></a></li>
+            </ul>
+        </nav>
+        <div class="logout-container">
+            <a href="/owner/logout" class="logout-btn"><i data-lucide="log-out"></i> <span>Logout</span></a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+
+        <div class="navbar">
+            <div class="user-profile">
+                <div class="avatar">
+                    <%= ownerName.charAt(0).toUpperCase() %>
+                </div>
+                <div class="user-info">
+                    <span>
+                        <%= ownerName %>
+                    </span>
+                    <small>Restaurant Owner</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-wrapper">
+            <div class="header">
+                <h1>Welcome, <%= ownerName %>
+                </h1>
+                <p>Monitor your restaurant hygiene scores and recent inspections.</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>Total Restaurants</h3>
+                        <p>
+                            <%= stats.totalRestaurants %>
+                        </p>
+                    </div>
+                    <div class="stat-icon" style="background:#fce7f3;color:#be185d;">
+                        <i data-lucide="store"></i>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>Active (Approved)</h3>
+                        <p>
+                            <%= stats.activeRestaurants %>
+                        </p>
+                    </div>
+                    <div class="stat-icon" style="background:#e0e7ff;color:#4f46e5;">
+                        <i data-lucide="check-circle"></i>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>Your Average Score</h3>
+                        <p>
+                            <%= stats.averageScore %>/5
+                        </p>
+                    </div>
+                    <div class="stat-icon" style="background:#dcfce3;color:#16a34a;">
+                        <i data-lucide="star"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Linked Restaurants -->
+            <div class="content-grid" style="grid-template-columns: 1fr; margin-top:24px;">
+                <div class="card table-card">
+                    <div class="card-header">
+                        <h2>Your Restaurants</h2>
+                    </div>
+                    <div class="table-responsive">
+                        <% if (restaurants.length===0) { %>
+                            <div style="padding: 20px; text-align: center; color: #6b7280;">
+                                <p>No restaurants found associated with your email (<strong>
+                                        <%= ownerEmail %>
+                                    </strong>).</p>
+                                <p>If you believe this is a mistake, please contact the Inspector to update your
+                                    restaurant email.</p>
+                            </div>
+                            <% } else { %>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Restaurant Name</th>
+                                            <th>License No.</th>
+                                            <th>Status</th>
+                                            <th>Latest Score</th>
+                                            <th>Region / Zone</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% restaurants.forEach(r=> { %>
+                                            <tr>
+                                                <td><strong>
+                                                        <%= r.name %>
+                                                    </strong></td>
+                                                <td>
+                                                    <%= r.license_number %>
+                                                </td>
+                                                <td>
+                                                    <span
+                                                        class="badge badge-<%= r.status === 'approved' ? 'success' : (r.status === 'rejected' ? 'danger' : 'warning') %>">
+                                                        <%= r.status %>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <% if (r.live_score) { %>
+                                                        <strong>
+                                                            <%= r.live_score %> / 5
+                                                        </strong>
+                                                        <% } else { %>
+                                                            <span style="color:#9ca3af;">Pending Audit</span>
+                                                            <% } %>
+                                                </td>
+                                                <td>
+                                                    <%= r.zone %> (<%= r.region %>)
+                                                </td>
+                                            </tr>
+                                            <% }) %>
+                                    </tbody>
+                                </table>
+                                <% } %>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Inspection Reports -->
+            <div class="content-grid" style="grid-template-columns: 1fr; margin-top:24px;">
+                <div class="card table-card">
+                    <div class="card-header">
+                        <h2>Recent Inspection Reports</h2>
+                    </div>
+                    <div class="table-responsive">
+                        <% if (reports.length===0) { %>
+                            <div style="padding: 20px; text-align: center; color: #6b7280;">
+                                <p>No inspection reports found for your restaurants yet.</p>
+                            </div>
+                            <% } else { %>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Restaurant</th>
+                                            <th>Inspector</th>
+                                            <th>Status</th>
+                                            <th>Score</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% reports.forEach(rep=> { %>
+                                            <tr>
+                                                <td>
+                                                    <%= new Date(rep.submitted_at).toLocaleDateString() %>
+                                                </td>
+                                                <td><strong>
+                                                        <%= rep.restaurant_name %>
+                                                    </strong></td>
+                                                <td>
+                                                    <%= rep.inspector_name %>
+                                                </td>
+                                                <td>
+                                                    <span
+                                                        class="badge badge-<%= rep.status === 'approved' ? 'success' : (rep.status === 'rejected' ? 'danger' : 'warning') %>">
+                                                        <%= rep.status %>
+                                                    </span>
+                                                </td>
+                                                <td><strong>
+                                                        <%= parseFloat(rep.hygiene_score).toFixed(1) %> / 5
+                                                    </strong></td>
+                                            </tr>
+                                            <% }) %>
+                                    </tbody>
+                                </table>
+                                <% } %>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <%- include('../chatWidget') %>
+
+        <script>
+            lucide.createIcons();
+        </script>
+</body>
+
+</html>

@@ -1,81 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Food Hygiene Inspection Hub</title>
   <link rel="stylesheet" href="/css/home1.css" />
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
+
 <body>
 
-<!-- Navigation -->
-<nav class="navbar">
-  <div class="container nav-wrapper">
-    <div class="logo">Food Hygiene Inspection Hub</div>
-    <div class="nav-links">
-      <a href="#login">Login</a>
-      <a href="#about">About</a>
-      <a href="#contact">Contact</a>
-    </div>
-  </div>
-</nav>
-
-<!-- Hero -->
-<section class="hero">
-  <div class="container center">
-    <h1>Ensuring Safer Dining Experiences</h1>
-    <p>Real-time inspections, public transparency, and hygiene-driven accountability for restaurants.</p>
-    <a href="#login" class="btn btn-primary">Explore Login Options</a>
-  </div>
-</section>
-
-<!-- Login Portals -->
-<section id="login" class="login-section">
-  <div class="container">
-    <h2 class="section-heading">Login Portals</h2>
-    <div class="login-cards">
-      <div class="card">
-        <h3>General Users</h3>
-        <p>View hygiene reports & ratings of registered restaurants in your area.</p>
-        <a href="/userLogin" class="btn btn-outline">User Login</a>
-      </div>
-      <div class="card">
-        <h3>Inspectors</h3>
-        <p>Submit inspection reports, upload evidence & assign scores.</p>
-        <a href="/inspectorLogin" class="btn btn-outline">Inspector Login</a>
-      </div>
-      <div class="card">
-        <h3>Admin</h3>
-        <p>Manage restaurants, inspectors, reports & approval workflows.</p>
-        <a href="/adminLogin" class="btn btn-outline">Admin Login</a>
-      </div>
-      <div class="card">
-        <h3>Super Admin</h3>
-        <p>Manage system admins, platform settings, and global configurations.</p>
-        <a href="/superadmin/login" class="btn btn-outline">Super Admin Login</a>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="container nav-wrapper">
+      <div class="logo">Food Hygiene Inspection Hub</div>
+      <div class="nav-links">
+        <a href="#login">Login</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
       </div>
     </div>
-  </div>
-</section>
+  </nav>
 
-<!-- About -->
-<section id="about" class="about-section">
-  <div class="container center">
-    <h2 class="section-heading">About the Platform</h2>
-    <p>This platform helps uphold public health by providing a transparent and tech-enabled system for food hygiene inspection, reporting, and accountability. It is built under the direction of FSSAI regulations to assist regulatory bodies, restaurants, and the public alike.</p>
-  </div>
-</section>
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container center">
+      <h1>Ensuring Safer Dining Experiences</h1>
+      <p>Real-time inspections, public transparency, and hygiene-driven accountability for restaurants.</p>
+      <a href="#login" class="btn btn-primary">Explore Login Options</a>
+    </div>
+  </section>
 
-<!-- Footer -->
-<footer class="footer">
-  <div class="container">
-    <p>&copy; <%= new Date().getFullYear() %> Food Hygiene Inspection Hub. All Rights Reserved.</p>
-  </div>
-</footer>
+  <!-- Login Portals -->
+  <section id="login" class="login-section">
+    <div class="container">
+      <h2 class="section-heading">Login Portals</h2>
+      <div class="login-cards">
+        <div class="card">
+          <h3>General Users</h3>
+          <p>View hygiene reports & ratings of registered restaurants in your area.</p>
+          <a href="/userLogin" class="btn btn-outline">User Login</a>
+        </div>
+        <div class="card">
+          <h3>Restaurant Owners</h3>
+          <p>Monitor your restaurant scores, update info, and review audit history.</p>
+          <a href="/ownerLogin" class="btn btn-outline" style="border-color: #be185d; color: #be185d;">Owner Login</a>
+        </div>
+        <div class="card">
+          <h3>Inspectors</h3>
+          <p>Submit inspection reports, upload evidence & assign scores.</p>
+          <a href="/inspectorLogin" class="btn btn-outline">Inspector Login</a>
+        </div>
+        <div class="card">
+          <h3>Admin</h3>
+          <p>Manage restaurants, inspectors, reports & approval workflows.</p>
+          <a href="/adminLogin" class="btn btn-outline">Admin Login</a>
+        </div>
+        <div class="card">
+          <h3>Super Admin</h3>
+          <p>Manage system admins, platform settings, and global configurations.</p>
+          <a href="/superadmin/login" class="btn btn-outline">Super Admin Login</a>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<script>
-  lucide.createIcons();
-</script>
+  <!-- About -->
+  <section id="about" class="about-section">
+    <div class="container center">
+      <h2 class="section-heading">About the Platform</h2>
+      <p>This platform helps uphold public health by providing a transparent and tech-enabled system for food hygiene
+        inspection, reporting, and accountability. It is built under the direction of FSSAI regulations to assist
+        regulatory bodies, restaurants, and the public alike.</p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; <%= new Date().getFullYear() %> Food Hygiene Inspection Hub. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+  </script>
 </body>
+
 </html>
