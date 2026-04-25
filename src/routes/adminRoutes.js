@@ -4,6 +4,7 @@ const db = require('../config/dbConnect');
 
 const { checklistSchema, sectionLabels } = require('../data/inspectionCategories');
 const PDFService = require('../services/pdfService');
+const emailService = require('../services/emailService');
 
 router.get('/adminLogin', (req, res) => {
   // Pass empty error variable if none exists
@@ -708,6 +709,19 @@ router.post('/admin/inspections/schedule', async (req, res) => {
       INSERT INTO inspections (restaurant_id, inspector_id, inspection_date, status)
       VALUES (?, ?, ?, 'Scheduled')
     `, [restaurant_id, inspector_id, inspection_date]);
+
+    // Fetch details for the email
+    const [[details]] = await db.query(`
+      SELECT i.email, i.name AS inspector_name, r.name AS restaurant_name
+      FROM inspectors i
+      JOIN restaurants r ON r.id = ?
+      WHERE i.id = ?
+    `, [restaurant_id, inspector_id]);
+
+    // Fire & Forget email dispatch
+    if (details && details.email) {
+      emailService.sendInspectionScheduledEmail(details.email, details.inspector_name, details.restaurant_name, inspection_date).catch(e => console.error(e));
+    }
 
     res.redirect('/admin/inspections/schedule');
   } catch (err) {

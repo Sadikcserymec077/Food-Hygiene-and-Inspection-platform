@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const db = require('./src/config/dbConnect');
+const db = require('../config/dbConnect');
+const emailService = require('../services/emailService');
 
 const JWT_SECRET = process.env.SESSION_SECRET || 'food-hygiene-reset-secret';
 const BASE_URL = process.env.BASE_URL || 'http://localhost:5000';
@@ -49,44 +50,9 @@ router.post('/forgot-password', async (req, res) => {
 
         const resetLink = `${BASE_URL}/reset-password?token=${token}&role=${role}`;
 
-        // ── If nodemailer/email is configured, send it; otherwise log to console ──
-        if (process.env.SMTP_USER && process.env.SMTP_PASS) {
-            try {
-                const nodemailer = require('nodemailer');
-                const transporter = nodemailer.createTransport({
-                    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-                    port: parseInt(process.env.SMTP_PORT || '587'),
-                    auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
-                });
-
-                await transporter.sendMail({
-                    from: `"Food Hygiene Platform" <${process.env.SMTP_USER}>`,
-                    to: email,
-                    subject: '🔐 Reset Your Password',
-                    html: `
-            <div style="font-family:Segoe UI,sans-serif;max-width:500px;margin:auto;padding:30px;border-radius:12px;background:#f9fafb">
-              <h2 style="color:#1d4ed8">Password Reset Request</h2>
-              <p>Hello! We received a request to reset your password for the Food Hygiene Inspection Platform.</p>
-              <p>Click the button below to reset your password. This link expires in <strong>15 minutes</strong>.</p>
-              <a href="${resetLink}" style="display:inline-block;margin:20px 0;padding:14px 28px;background:linear-gradient(135deg,#1d4ed8,#0ea5e9);color:white;text-decoration:none;border-radius:8px;font-weight:bold">Reset My Password</a>
-              <p style="color:#9ca3af;font-size:12px">If you didn't request this, please ignore this email. Your password won't be changed.</p>
-            </div>
-          `
-                });
-
-                return res.render('forgotPassword', { success: successMsg });
-
-            } catch (emailErr) {
-                console.error('Email send error:', emailErr.message);
-                // Fall through to console log fallback
-            }
-        }
-
-        // ── Fallback: show the reset link directly on the page (dev mode) ──
-        console.log(`\n[PASSWORD RESET] Link for ${email} (${role}):\n${resetLink}\n`);
-        return res.render('forgotPassword', {
-            success: `Reset link generated! Since email is not configured, here is your reset link (valid for 15 min):\n${resetLink}`,
-        });
+        // Send via email service (handles both SMTP and console fallback gracefully)
+        await emailService.sendPasswordResetEmail(email, resetLink);
+        return res.render('forgotPassword', { success: successMsg });
 
     } catch (err) {
         console.error('Forgot password error:', err);

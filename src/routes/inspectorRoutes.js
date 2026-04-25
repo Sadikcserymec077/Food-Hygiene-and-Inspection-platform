@@ -7,6 +7,7 @@ const qs = require('qs');
 const db = require('../config/dbConnect');
 
 const { checklistSchema, sectionLabels } = require('../data/inspectionCategories');
+const emailService = require('../services/emailService');
 const PDFService = require('../services/pdfService');
 const { storage } = require('../config/cloudinary');
 const upload = multer({
@@ -635,11 +636,24 @@ router.post('/inspector/complaints/resolve/:id', async (req, res) => {
   const { resolution } = req.body;
 
   try {
+    // Determine the user's email and the restaurant's name before updating
+    const [[complaint]] = await db.query(`
+      SELECT c.user_id, r.name AS restaurant_name
+      FROM complaints c
+      JOIN restaurants r ON c.restaurant_id = r.id
+      WHERE c.id = ?
+    `, [complaintId]);
+
     await db.query(`
       UPDATE complaints 
       SET status = 'resolved', resolution_taken = ?, updated_at = NOW()
       WHERE id = ?
     `, [resolution, complaintId]);
+
+    // Fire & Forget email dispatch
+    if (complaint && complaint.user_id) {
+      emailService.sendComplaintResolvedEmail(complaint.user_id, complaint.restaurant_name, resolution).catch(e => console.error(e));
+    }
 
     res.redirect('/inspector/complaints');
   } catch (err) {
