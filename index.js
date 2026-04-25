@@ -75,6 +75,9 @@ app.use(userRoutes);
 const superAdminRoutes = require("./src/routes/superAdminRoutes");
 app.use(superAdminRoutes);
 
+const passwordResetRoutes = require("./src/routes/passwordResetRoutes");
+app.use(passwordResetRoutes);
+
 // Routes
 app.get('/', (req, res) => res.render('home1'));
 

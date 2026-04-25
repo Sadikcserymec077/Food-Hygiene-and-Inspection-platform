@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>FSSAI Inspector Login</title>
@@ -9,12 +10,14 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
+
 <body>
   <div class="login-wrapper">
     <div class="login-card">
       <div class="icon">
-        <svg xmlns="http://www.w3.org/2000/svg" class="lucide lucide-shield" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/>
+        <svg xmlns="http://www.w3.org/2000/svg" class="lucide lucide-shield" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
         </svg>
       </div>
       <h1>FSSAI Inspector Hub</h1>
@@ -44,13 +47,16 @@
           <span>Log In</span>
           <i class="fas fa-arrow-right"></i>
         </button>
+        <p style="text-align:center;margin-top:14px;">
+          <a href="/forgot-password" style="color:#2563eb;font-size:0.9rem;">🔐 Forgot your password?</a>
+        </p>
       </form>
     </div>
   </div>
 
   <script>
     // Toggle password visibility
-    document.querySelector('.toggle-password')?.addEventListener('click', function() {
+    document.querySelector('.toggle-password')?.addEventListener('click', function () {
       const password = document.getElementById('password');
       const icon = this.querySelector('i');
       if (password.type === 'password') {
@@ -77,4 +83,5 @@
     }
   </script>
 </body>
+
 </html>
