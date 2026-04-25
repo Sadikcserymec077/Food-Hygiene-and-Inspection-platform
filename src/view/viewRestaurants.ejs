@@ -1,125 +1,245 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <title>View Restaurants – FSSAI Inspector Hub</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="/css/viewRestaurants.css" />
   <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Leaflet CSS & JS for Interactive Map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+  <style>
+    #map {
+      height: 400px;
+      width: 100%;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e5e7eb;
+      z-index: 1;
+    }
+
+    .leaflet-popup-content h3 {
+      margin: 0 0 5px;
+      font-size: 16px;
+      color: #1e3a8a;
+    }
+
+    .leaflet-popup-content p {
+      margin: 0;
+      font-size: 13px;
+      color: #4b5563;
+    }
+
+    .marker-score {
+      background: white;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 12px;
+      border: 3px solid;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .marker-green {
+      border-color: #10b981;
+      color: #047857;
+    }
+
+    .marker-orange {
+      border-color: #f59e0b;
+      color: #b45309;
+    }
+
+    .marker-red {
+      border-color: #ef4444;
+      color: #b91c1c;
+    }
+  </style>
 </head>
+
 <body>
-<%- include('partials/header2') %>
+  <%- include('partials/header2') %>
 
-<div class="wrapper">
+    <div class="wrapper">
 
-  <div class="header">
-    <div>
-      <h1>View Restaurants</h1>
-      <p>Browse restaurants in your assigned region</p>
-    </div>
-    <div class="location">
-      <i data-lucide="building-2" class="lucide-icon blue"></i>
-      <span><%= zone %> – <%= region %></span>
-    </div>
-  </div>
-
-  <!-- Tabs -->
-  <div class="tabs">
-    <button class="tab-btn active" data-tab="approved">Approved (<%= approved.length %>)</button>
-    <button class="tab-btn" data-tab="pending">Pending (<%= pending.length %>)</button>
-    <button class="tab-btn" data-tab="rejected">Rejected (<%= rejected.length %>)</button>
-  </div>
-
-  <!-- Search Bar -->
-  <div class="search-card">
-    <div class="search-input">
-      <i data-lucide="search" class="search-icon"></i>
-      <input type="text" id="searchBar" placeholder="Search restaurants by name, license or contact..." oninput="filterRestaurants()">
-    </div>
-  </div>
-
-  <% ['approved', 'pending', 'rejected'].forEach(tab => { 
-       const restaurants = tab === 'approved' ? approved : (tab === 'pending' ? pending : rejected); %>
-    <div class="tab-content <%= tab === 'approved' ? 'active' : '' %>" id="<%= tab %>">
-      <% if (restaurants.length === 0) { %>
-        <div class="empty-state">
-          <i data-lucide="building-2" class="lucide-icon gray big"></i>
-          <h3>No <%= tab %> Restaurants</h3>
-          <p>No <%= tab %> restaurants found in your region.</p>
+      <div class="header">
+        <div>
+          <h1>View Restaurants</h1>
+          <p>Browse restaurants in your assigned region</p>
         </div>
-      <% } else { %>
-        <div class="restaurant-grid">
-          <% restaurants.forEach(r => { %>
-            <div class="restaurant-card">
-              <div class="card-header">
-                <div class="left">
-                  <i data-lucide="building-2" class="lucide-icon blue"></i>
-                  <div>
-                    <h3><%= r.name %></h3>
-                    <p>License: <%= r.license_number %></p>
-                  </div>
-                </div>
-                <div class="badges">
-                  <span class="badge <%= r.status %>"><%= r.status %></span>
-                  <% if (r.hygiene_score) { %>
-                    <span class="badge score <%= r.hygiene_score >= 4 ? 'green' : (r.hygiene_score >= 3 ? 'orange' : 'red') %>">
-                      Score: <%= r.hygiene_score %>/5.0
-                    </span>
-                  <% } %>
-                </div>
-              </div>
-              <div class="card-content">
-                <div>
-                  <p><i data-lucide="map-pin"></i> <%= r.address %></p>
-                  <p><i data-lucide="phone"></i> <%= r.phone %></p>
-                  <p><i data-lucide="mail"></i> <%= r.email %></p>
-                </div>
-                <div>
-                  <p><strong>Contact:</strong> <%= r.contact_person || 'N/A' %></p>
-                  <% if (r.last_inspection_date) { %>
-                    <p><i data-lucide="calendar"></i> Last Inspection: <%= new Date(r.last_inspection_date).toLocaleDateString() %></p>
-                  <% } %>
-                </div>
-              </div>
-              <% if (tab === 'approved') { %>
-                <div class="card-footer">
-                
-                </div>
-              <% } %>
+        <div class="location">
+          <i data-lucide="building-2" class="lucide-icon blue"></i>
+          <span>
+            <%= zone %> – <%= region %>
+          </span>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="approved">Approved (<%= approved.length %>)</button>
+        <button class="tab-btn" data-tab="pending">Pending (<%= pending.length %>)</button>
+        <button class="tab-btn" data-tab="rejected">Rejected (<%= rejected.length %>)</button>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="search-card">
+        <div class="search-input">
+          <i data-lucide="search" class="search-icon"></i>
+          <input type="text" id="searchBar" placeholder="Search restaurants by name, license or contact..."
+            oninput="filterRestaurants()">
+        </div>
+      </div>
+
+      <!-- The Interactive Map Container -->
+      <div id="map"></div>
+
+      <% ['approved', 'pending' , 'rejected' ].forEach(tab=> {
+        const restaurants = tab === 'approved' ? approved : (tab === 'pending' ? pending : rejected); %>
+        <div class="tab-content <%= tab === 'approved' ? 'active' : '' %>" id="<%= tab %>">
+          <% if (restaurants.length===0) { %>
+            <div class="empty-state">
+              <i data-lucide="building-2" class="lucide-icon gray big"></i>
+              <h3>No <%= tab %> Restaurants</h3>
+              <p>No <%= tab %> restaurants found in your region.</p>
             </div>
-          <% }) %>
+            <% } else { %>
+              <div class="restaurant-grid">
+                <% restaurants.forEach(r=> { %>
+                  <div class="restaurant-card">
+                    <div class="card-header">
+                      <div class="left">
+                        <i data-lucide="building-2" class="lucide-icon blue"></i>
+                        <div>
+                          <h3>
+                            <%= r.name %>
+                          </h3>
+                          <p>License: <%= r.license_number %>
+                          </p>
+                        </div>
+                      </div>
+                      <div class="badges">
+                        <span class="badge <%= r.status %>">
+                          <%= r.status %>
+                        </span>
+                        <% if (r.hygiene_score) { %>
+                          <span
+                            class="badge score <%= r.hygiene_score >= 4 ? 'green' : (r.hygiene_score >= 3 ? 'orange' : 'red') %>">
+                            Score: <%= r.hygiene_score %>/5.0
+                          </span>
+                          <% } %>
+                      </div>
+                    </div>
+                    <div class="card-content">
+                      <div>
+                        <p><i data-lucide="map-pin"></i>
+                          <%= r.address %>
+                        </p>
+                        <p><i data-lucide="phone"></i>
+                          <%= r.phone %>
+                        </p>
+                        <p><i data-lucide="mail"></i>
+                          <%= r.email %>
+                        </p>
+                      </div>
+                      <div>
+                        <p><strong>Contact:</strong>
+                          <%= r.contact_person || 'N/A' %>
+                        </p>
+                        <% if (r.last_inspection_date) { %>
+                          <p><i data-lucide="calendar"></i> Last Inspection: <%= new
+                              Date(r.last_inspection_date).toLocaleDateString() %>
+                          </p>
+                          <% } %>
+                      </div>
+                    </div>
+                    <% if (tab==='approved' ) { %>
+                      <div class="card-footer">
+
+                      </div>
+                      <% } %>
+                  </div>
+                  <% }) %>
+              </div>
+              <% } %>
         </div>
-      <% } %>
+        <% }) %>
     </div>
-  <% }) %>
-</div>
 
-<script>
-  lucide.createIcons();
+    <script>
+      lucide.createIcons();
 
-  // Tab Switching
-  const tabs = document.querySelectorAll('.tab-btn');
-  const contents = document.querySelectorAll('.tab-content');
-  tabs.forEach(btn => {
-    btn.addEventListener('click', () => {
-      tabs.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      contents.forEach(c => c.classList.remove('active'));
-      document.getElementById(btn.dataset.tab).classList.add('active');
-    });
-  });
+      // Tab Switching
+      const tabs = document.querySelectorAll('.tab-btn');
+      const contents = document.querySelectorAll('.tab-content');
+      tabs.forEach(btn => {
+        btn.addEventListener('click', () => {
+          tabs.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          contents.forEach(c => c.classList.remove('active'));
+          document.getElementById(btn.dataset.tab).classList.add('active');
+        });
+      });
 
-  // Search Functionality
-  function filterRestaurants() {
-    const query = document.getElementById("searchBar").value.toLowerCase();
-    const activeTab = document.querySelector('.tab-content.active').id;
-    const cards = document.querySelectorAll(`#${activeTab} .restaurant-card`);
-    
-    cards.forEach(card => {
-      const text = card.innerText.toLowerCase();
-      card.style.display = text.includes(query) ? "block" : "none";
-    });
-  }
-</script>
+      // Search Functionality
+      function filterRestaurants() {
+        const query = document.getElementById("searchBar").value.toLowerCase();
+        const activeTab = document.querySelector('.tab-content.active').id;
+        const cards = document.querySelectorAll(`#${activeTab} .restaurant-card`);
+
+        cards.forEach(card => {
+          const text = card.innerText.toLowerCase();
+          card.style.display = text.includes(query) ? "block" : "none";
+        });
+      }
+
+      // Map Initialization
+      const map = L.map('map').setView([28.6139, 77.2090], 11);
+
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap &copy; CARTO'
+      }).addTo(map);
+
+      const restaurantsData = <% - JSON.stringify(approved) %>;
+      const centerLat = 28.6139;
+      const centerLng = 77.2090;
+
+      restaurantsData.forEach((r, index) => {
+        const offsetLat = Math.sin(r.id * 10) * 0.1;
+        const offsetLng = Math.cos(r.id * 10) * 0.1;
+        const lat = centerLat + offsetLat;
+        const lng = centerLng + offsetLng;
+
+        const score = parseFloat(r.hygiene_score || 0);
+        let colorClass = 'marker-green';
+        if (score > 0 && score < 2) colorClass = 'marker-red';
+        else if (score > 0 && score < 4) colorClass = 'marker-orange';
+
+        const customIcon = L.divIcon({
+          className: 'custom-marker',
+          html: '<div class="marker-score ' + colorClass + '">' + (score > 0 ? score : 'N/A') + '</div>',
+          iconSize: [30, 30],
+          iconAnchor: [15, 15]
+        });
+
+        L.marker([lat, lng], { icon: customIcon }).addTo(map)
+          .bindPopup(
+            '<h3>' + r.name + '</h3>' +
+            '<p><strong>License:</strong> ' + r.license_number + '</p>' +
+            '<p><strong>Score:</strong> ' + (score > 0 ? score + ' / 5' : 'No Inspections') + '</p>'
+          );
+      });
+    </script>
 </body>
+
 </html>

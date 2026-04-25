@@ -1,69 +1,184 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Search Restaurants</title>
   <link rel="stylesheet" href="/css/userSearch.css">
   <script defer src="/js/searchLive.js"></script>
-  <script defer src="/js/favoriteToggle.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Leaflet CSS & JS for Interactive Map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+  <style>
+    #map {
+      height: 400px;
+      width: 100%;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e5e7eb;
+      z-index: 1;
+      /* Keep under navbar */
+    }
+
+    .leaflet-popup-content h3 {
+      margin: 0 0 5px;
+      font-size: 16px;
+      color: #1e3a8a;
+    }
+
+    .leaflet-popup-content p {
+      margin: 0;
+      font-size: 13px;
+      color: #4b5563;
+    }
+
+    .marker-score {
+      background: white;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 12px;
+      border: 3px solid;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .marker-green {
+      border-color: #10b981;
+      color: #047857;
+    }
+
+    .marker-orange {
+      border-color: #f59e0b;
+      color: #b45309;
+    }
+
+    .marker-red {
+      border-color: #ef4444;
+      color: #b91c1c;
+    }
+  </style>
 </head>
+
 <body>
   <%- include('../partials/header3') %>
-  <div class="container">
-    <h1>Search Restaurants</h1>
-    <p class="subtitle">Find restaurants in your area</p>
+    <div class="container">
+      <h1>Search Restaurants</h1>
+      <p class="subtitle">Find restaurants in your area</p>
 
-    <div class="card">
-      <div class="card-header">Filters</div>
-      <div class="card-content">
-        <div class="filters">
-          <input type="text" id="searchBar" placeholder="Search restaurants by name..." />
+      <div class="card">
+        <div class="card-header">Filters</div>
+        <div class="card-content">
+          <div class="filters">
+            <input type="text" id="searchBar" placeholder="Search restaurants by name..." />
+          </div>
         </div>
+      </div>
+
+      <!-- The Interactive Map Container -->
+      <div id="map"></div>
+
+      <div class="grid" id="restaurantGrid">
+        <% restaurants.forEach(restaurant=> { %>
+          <div class="card restaurant-card">
+            <div class="top-section">
+              <h3>
+                <%= restaurant.name %>
+              </h3>
+
+              <% let score=restaurant.hygiene_score; let scoreClass='badge-green' ; if (score < 2)
+                scoreClass='badge-red' ; else if (score < 4) scoreClass='badge-orange' ; %>
+                <span class="badge <%= scoreClass %>">Score: <%= score %> / 5</span>
+            </div>
+
+            <div class="info-section">
+              <p><strong>Location:</strong>
+                <%= restaurant.location %>
+              </p>
+              <p><strong>Zone:</strong>
+                <%= restaurant.zone %>
+              </p>
+            </div>
+
+            <div class="button-group">
+              <form action="/user/restaurant/<%= restaurant.id %>" method="get" style="display: inline;">
+                <button type="submit" class="details-btn">View Details</button>
+              </form>
+
+              <form action="/user/complaint/<%= restaurant.id %>" method="get" style="display: inline;">
+                <button type="submit" class="details-btn complaint-btn">File Complaint</button>
+              </form>
+
+              <button class="favorite-btn <%= restaurant.is_favorite ? 'favorited' : '' %>"
+                data-id="<%= restaurant.id %>" data-fav="<%= restaurant.is_favorite %>"
+                title="<%= restaurant.is_favorite ? 'Remove from Favorites' : 'Add to Favorites' %>">
+                <i class="<%= restaurant.is_favorite ? 'fa-solid fa-heart' : 'fa-regular fa-heart' %>"></i>
+              </button>
+
+            </div>
+          </div>
+          <% }) %>
       </div>
     </div>
 
-    <div class="grid" id="restaurantGrid">
-      <% restaurants.forEach(restaurant => { %>
-        <div class="card restaurant-card">
-          <div class="top-section">
-            <h3><%= restaurant.name %></h3>
+    <script>
+      // 1. Initialize Map centered on New Delhi (FSSAI context)
+      const map = L.map('map').setView([28.6139, 77.2090], 11);
 
-            <% 
-              let score = restaurant.hygiene_score;
-              let scoreClass = 'badge-green';
-              if (score < 2) scoreClass = 'badge-red';
-              else if (score < 4) scoreClass = 'badge-orange';
-            %>
-            <span class="badge <%= scoreClass %>">Score: <%= score %> / 5</span>
-          </div>
+      // 2. Add OpenStreetMap dark/light theme tiles
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap &copy; CARTO'
+      }).addTo(map);
 
-          <div class="info-section">
-            <p><strong>Location:</strong> <%= restaurant.location %></p>
-            <p><strong>Zone:</strong> <%= restaurant.zone %></p>
-          </div>
+      // 3. Pass server-side restaurants data to client
+      const restaurantsData = <% - JSON.stringify(restaurants) %>;
 
-          <div class="button-group">
-            <form action="/user/restaurant/<%= restaurant.id %>" method="get" style="display: inline;">
-              <button type="submit" class="details-btn">View Details</button>
-            </form>
+      // 4. Generate markers
+      // Since we don't have lat/lng in DB, we'll scatter them realistically around the center
+      const centerLat = 28.6139;
+      const centerLng = 77.2090;
 
-            <form action="/user/complaint/<%= restaurant.id %>" method="get" style="display: inline;">
-              <button type="submit" class="details-btn complaint-btn">File Complaint</button>
-            </form>
+      restaurantsData.forEach((r, index) => {
+        // Create a stable pseudo-random offset based on ID or Index
+        const offsetLat = Math.sin(r.id * 10) * 0.1;
+        const offsetLng = Math.cos(r.id * 10) * 0.1;
 
-            <button class="favorite-btn <%= restaurant.is_favorite ? 'favorited' : '' %>" 
-                data-id="<%= restaurant.id %>" 
-                data-fav="<%= restaurant.is_favorite %>" 
-                title="<%= restaurant.is_favorite ? 'Remove from Favorites' : 'Add to Favorites' %>">
-          <i class="<%= restaurant.is_favorite ? 'fa-solid fa-heart' : 'fa-regular fa-heart' %>"></i>
-        </button>
-        
-          </div>
-        </div>
-      <% }) %>
-    </div>
-  </div>
-  
+        const lat = centerLat + offsetLat;
+        const lng = centerLng + offsetLng;
+
+        // Determine color based on hygiene score
+        const score = parseFloat(r.hygiene_score || 0);
+        let colorClass = 'marker-green';
+        if (score < 2) colorClass = 'marker-red';
+        else if (score < 4) colorClass = 'marker-orange';
+
+        // Custom HTML Marker using DivIcon
+        const customIcon = L.divIcon({
+          className: 'custom-marker',
+          html: '<div class="marker-score ' + colorClass + '">' + score + '</div>',
+          iconSize: [30, 30],
+          iconAnchor: [15, 15]
+        });
+
+        // Add to map
+        L.marker([lat, lng], { icon: customIcon }).addTo(map)
+          .bindPopup(
+            '<h3>' + r.name + '</h3>' +
+            '<p><strong>Zone:</strong> ' + r.zone + '</p>' +
+            '<p><strong>Score:</strong> ' + score + ' / 5</p><br>' +
+            '<a href="/user/restaurant/' + r.id + '" style="color:#2563eb;text-decoration:none;font-weight:bold;">View Details &rarr;</a>'
+          );
+      });
+    </script>
+
 </body>
+
 </html>
