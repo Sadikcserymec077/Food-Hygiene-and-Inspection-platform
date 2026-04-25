@@ -3,13 +3,13 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const qs = require('qs'); 
+const qs = require('qs');
 const db = require('../config/dbConnect');
 
 const { checklistSchema, sectionLabels } = require('../data/inspectionCategories');
 const PDFService = require('../services/pdfService');
 const { storage } = require('../config/cloudinary');
-const upload = multer({ 
+const upload = multer({
   storage: storage,
   limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
 });
@@ -60,8 +60,8 @@ router.post('/inspectorLogin', async (req, res) => {
 
     req.session.zone = results[0].zone;
     req.session.inspectorName = results[0].name;
-    req.session.region=results[0].region;
-    req.session.ID=results[0].id;
+    req.session.region = results[0].region;
+    req.session.ID = results[0].id;
     res.redirect('inspector/dashboard');
   } catch (err) {
     console.error("Database error:", err);
@@ -69,7 +69,7 @@ router.post('/inspectorLogin', async (req, res) => {
   }
 });
 
-  router.get('/inspector/dashboard', async (req, res) => {
+router.get('/inspector/dashboard', async (req, res) => {
   const inspectorId = req.session.ID;
   const inspectorName = req.session.inspectorName || 'Inspector';
   const zone = req.session.zone;
@@ -134,7 +134,7 @@ router.post('/inspectorLogin', async (req, res) => {
 });
 
 
-  router.get('/inspector/inspections/scheduled', async (req, res) => {
+router.get('/inspector/inspections/scheduled', async (req, res) => {
   const inspectorId = req.session.ID; // Or however you store logged-in user
   if (!inspectorId) return res.redirect('/inspectorLogin');
 
@@ -156,7 +156,7 @@ router.post('/inspectorLogin', async (req, res) => {
 
 
 
-  // GET route
+// GET route
 router.get('/inspector/restaurants/add', (req, res) => {
   const { zone, region, inspectorName } = req.session;
   const success = req.query.success;
@@ -187,8 +187,8 @@ router.post('/inspector/restaurants/add', async (req, res) => {
   }
 });
 
-  
-  // routes/inspector.js
+
+// routes/inspector.js
 
 router.get('/inspector/restaurants', async (req, res) => {
   const zone = req.session.zone;
@@ -197,7 +197,7 @@ router.get('/inspector/restaurants', async (req, res) => {
   try {
     const [allRestaurants] = await db.query(`
       SELECT id, name, contact_person, license_number, email, phone, zone, region, 
-             address, status, hygiene_score, created_at, last_inspection_date
+             address, status, hygiene_score, last_inspection_date
       FROM restaurants
       WHERE zone = ? AND region = ?
     `, [zone, region]);
@@ -224,7 +224,7 @@ router.get('/inspector/restaurants', async (req, res) => {
 router.get('/inspector/restaurants/edit/:id', async (req, res) => {
   try {
     const [restaurant] = await db.query('SELECT * FROM restaurants WHERE id = ?', [req.params.id]);
-    
+
     if (!restaurant) {
       return res.status(404).render('error', { message: "Restaurant not found." });
     }
@@ -241,7 +241,7 @@ router.get('/inspector/restaurants/edit/:id', async (req, res) => {
 });
 
 router.post('/inspector/restaurants/edit/:id', async (req, res) => {
-  
+
   const { name, license_number, contact_person, phone, email, address, region, status } = req.body;
   await db.query(
     'UPDATE restaurants SET name=?, license_number=?, contact_person=?, phone=?, email=?, address=?, region=?, status=? WHERE id=?',
@@ -293,8 +293,8 @@ router.get('/inspection/start/:id', async (req, res) => {
     // Badge color logic
     const scoreBadge =
       hygieneScore >= 4.0 ? 'green'
-      : hygieneScore >= 3.0 ? 'orange'
-      : 'red';
+        : hygieneScore >= 3.0 ? 'orange'
+          : 'red';
 
     // Render the inspection page
     res.render('startInspection', {
@@ -524,27 +524,27 @@ router.get('/inspector/view-report/:id/pdf', async (req, res) => {
     }
 
     const pdfBuffer = await PDFService.generateInspectionReportPDF({
-  report: {
-    ...report,
-    report_data: reportData,
-    image_urls: imageUrls
-  },
-  restaurant: {
-    name: report.restaurant_name,
-    license_number: report.license_number,
-    phone: report.phone,
-    email: report.email,
-    address: report.address,
-    zone: report.restaurant_zone,
-    region: report.restaurant_region
-  },
-  inspector: {
-    name: report.inspector_name
-  },
-  admin: {
-    name: report.admin_name || null
-  }
-});
+      report: {
+        ...report,
+        report_data: reportData,
+        image_urls: imageUrls
+      },
+      restaurant: {
+        name: report.restaurant_name,
+        license_number: report.license_number,
+        phone: report.phone,
+        email: report.email,
+        address: report.address,
+        zone: report.restaurant_zone,
+        region: report.restaurant_region
+      },
+      inspector: {
+        name: report.inspector_name
+      },
+      admin: {
+        name: report.admin_name || null
+      }
+    });
 
 
     res.set({
@@ -673,32 +673,32 @@ router.post('/inspector/complaints/resolve/:id', async (req, res) => {
 // });
 
 
-  
+
 //Post
 
 //   router.post('/inspections/start/:id', async (req, res) => {
 //     const inspectionId = req.params.id;
 //     const inspectorId = req.session.ID; // assumes you have a login with a session
 //     const formData = req.body;
-  
+
 //     try {
 //       // Get restaurant ID from inspection
 //       const [[inspection]] = await db.query(
 //         `SELECT * FROM inspections WHERE id = ?`,
 //         [inspectionId]
 //       );
-  
+
 //       if (!inspection) {
 //         return res.status(404).render('error', { message: 'Invalid inspection ID' });
 //       }
-  
+
 //       // Build JSON from checkbox data
 //       const report = {};
-  
+
 //       for (const category in formData) {
 //         if (category !== 'notes') { // exclude notes from report
 //           report[category] = {};
-  
+
 //           for (const item in formData[category]) {
 //             report[category][item] = true;
 //           }
@@ -712,14 +712,14 @@ router.post('/inspector/complaints/resolve/:id', async (req, res) => {
 //           VALUES (?, ?, ?, ?, ?)`,
 //         [inspectionId, inspectorId, inspection.restaurant_id, JSON.stringify(report), notes]
 //       );
-  
+
 //       // Update inspection's status to Completed
 //       await db.query(
 //         `UPDATE inspections SET status = 'Completed' WHERE id = ?`,
 //         [inspectionId]
 //       );
-  
-      
+
+
 // return res.render('success', { message: 'Inspection successfully submitted!' });
 
 //     } catch (err) {
@@ -727,6 +727,6 @@ router.post('/inspector/complaints/resolve/:id', async (req, res) => {
 //       res.status(500).render('error', { message: 'Failed to submit inspection' });
 //     }
 //   });
-  
+
 
 module.exports = router; 
