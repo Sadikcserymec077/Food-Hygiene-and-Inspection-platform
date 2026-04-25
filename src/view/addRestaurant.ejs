@@ -1,84 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <title>Add Restaurant – FSSAI Inspector Hub</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="/css/addRestaurant.css" />
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
+
 <body>
 
-<%- include('partials/header2') %>
+  <%- include('partials/header2') %>
 
-<div class="add-container">
-  <!-- Header Section -->
-  <div class="add-header">
-    <div>
-      <h1>Add New Restaurant</h1>
-      <p>Register a new restaurant for hygiene inspection</p>
+    <div class="add-container">
+      <!-- Header Section -->
+      <div class="add-header">
+        <div>
+          <h1>Add New Restaurant</h1>
+          <p>Register a new restaurant for hygiene inspection</p>
+        </div>
+        <div class="assignment">
+          <i data-lucide="plus" class="lucide-icon green"></i>
+          <span>
+            <%= zone %> – <%= region %>
+          </span>
+        </div>
+      </div>
+
+      <% if (success) { %>
+        <div class="success-message">✅ Restaurant added successfully!</div>
+        <% } %>
+
+          <!-- Form Card -->
+          <div class="card">
+            <h2>Restaurant Details</h2>
+            <p class="subtitle">Fill in the restaurant information. It will be submitted for admin approval.</p>
+
+            <form action="/inspector/restaurants/add" method="POST" class="add-form">
+              <div class="form-grid">
+                <div>
+                  <label for="name">Restaurant Name *</label>
+                  <input type="text" name="name" required placeholder="Enter restaurant name" />
+                </div>
+                <div>
+                  <label for="license_number">License Number *</label>
+                  <input type="text" name="license_number" required placeholder="LIC-XXXXX" />
+                </div>
+                <div>
+                  <label for="contact_person">Contact Person *</label>
+                  <input type="text" name="contact_person" required placeholder="Owner/Manager name" />
+                </div>
+                <div>
+                  <label for="phone">Phone Number *</label>
+                  <input type="text" name="phone" required placeholder="+91-XXXXXXXXXX" />
+                </div>
+                <div>
+                  <label for="email">Email Address</label>
+                  <input type="email" name="email" placeholder="restaurant@example.com" />
+                </div>
+              </div>
+
+              <div class="textarea-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <label for="address" style="margin-bottom: 0;">Complete Address *</label>
+                  <button type="button" id="gpsAutoFillBtn"
+                    style="background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                    <i data-lucide="map-pin" style="width: 14px; height: 14px;"></i> Use Current Location
+                  </button>
+                </div>
+                <textarea name="address" id="addressTextarea" rows="3" required
+                  placeholder="Enter complete address"></textarea>
+              </div>
+
+              <div class="assignment-info">
+                <strong>Assignment Details</strong>
+                <p>Zone: <%= zone %>
+                </p>
+                <p>Region: <%= region %>
+                </p>
+                <p>Inspector: <%= inspectorName %>
+                </p>
+              </div>
+
+              <div class="form-actions">
+                <a href="/inspector/dashboard" class="btn-outline">Cancel</a>
+                <button type="submit" class="btn-black">Add Restaurant</button>
+              </div>
+            </form>
+          </div>
     </div>
-    <div class="assignment">
-      <i data-lucide="plus" class="lucide-icon green"></i>
-      <span><%= zone %> – <%= region %></span>
-    </div>
-  </div>
 
-  <% if (success) { %>
-    <div class="success-message">✅ Restaurant added successfully!</div>
-  <% } %>
+    <script>
+      lucide.createIcons();
 
-  <!-- Form Card -->
-  <div class="card">
-    <h2>Restaurant Details</h2>
-    <p class="subtitle">Fill in the restaurant information. It will be submitted for admin approval.</p>
+      document.getElementById('gpsAutoFillBtn').addEventListener('click', function () {
+        const btn = this;
+        const originalText = btn.innerHTML;
+        btn.innerHTML = `<i data-lucide="loader" class="lucide-icon spin" style="width: 14px; height: 14px;"></i> Locating...`;
 
-    <form action="/inspector/restaurants/add" method="POST" class="add-form">
-      <div class="form-grid">
-        <div>
-          <label for="name">Restaurant Name *</label>
-          <input type="text" name="name" required placeholder="Enter restaurant name" />
-        </div>
-        <div>
-          <label for="license_number">License Number *</label>
-          <input type="text" name="license_number" required placeholder="LIC-XXXXX" />
-        </div>
-        <div>
-          <label for="contact_person">Contact Person *</label>
-          <input type="text" name="contact_person" required placeholder="Owner/Manager name" />
-        </div>
-        <div>
-          <label for="phone">Phone Number *</label>
-          <input type="text" name="phone" required placeholder="+91-XXXXXXXXXX" />
-        </div>
-        <div>
-          <label for="email">Email Address</label>
-          <input type="email" name="email" placeholder="restaurant@example.com" />
-        </div>
-      </div>
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(async position => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
 
-      <div class="textarea-section">
-        <label for="address">Complete Address *</label>
-        <textarea name="address" rows="3" required placeholder="Enter complete address"></textarea>
-      </div>
-
-      <div class="assignment-info">
-        <strong>Assignment Details</strong>
-        <p>Zone: <%= zone %></p>
-        <p>Region: <%= region %></p>
-        <p>Inspector: <%= inspectorName %></p>
-      </div>
-
-      <div class="form-actions">
-        <a href="/inspector/dashboard" class="btn-outline">Cancel</a>
-        <button type="submit" class="btn-black">Add Restaurant</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<script>
-  lucide.createIcons();
-</script>
+            try {
+              const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`);
+              const data = await response.json();
+              if (data && data.display_name) {
+                document.getElementById('addressTextarea').value = data.display_name;
+                btn.innerHTML = `<i data-lucide="check" style="width: 14px; height: 14px; color: #10b981;"></i> Success`;
+                setTimeout(() => { btn.innerHTML = originalText; lucide.createIcons(); }, 3000);
+              } else {
+                throw new Error('No address found');
+              }
+            } catch (e) {
+              alert("Failed to find address from coordinates. Please enter manually.");
+              btn.innerHTML = originalText;
+            }
+            lucide.createIcons();
+          }, err => {
+            alert("Location access denied or unavailable.");
+            btn.innerHTML = originalText;
+            lucide.createIcons();
+          });
+        } else {
+          alert("Geolocation is not supported by this browser.");
+          btn.innerHTML = originalText;
+        }
+      });
+    </script>
 </body>
+
 </html>
