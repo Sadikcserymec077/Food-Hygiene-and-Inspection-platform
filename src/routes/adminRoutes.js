@@ -519,13 +519,36 @@ router.post('/admin/restaurants/edit/:id', async (req, res) => {
   res.redirect('/admin/restaurants');
 });
 
+// GET approve/reject routes (used by EJS link buttons)
+router.get('/admin/restaurants/approve/:id', async (req, res) => {
+  if (!req.session.adminName || !req.session.zone) return res.redirect('/adminLogin');
+  try {
+    await db.query("UPDATE restaurants SET status = 'approved' WHERE id = ?", [req.params.id]);
+    res.redirect('/admin/restaurants');
+  } catch (err) {
+    console.error('Approve failed:', err);
+    res.status(500).render('error', { message: 'Failed to approve restaurant.' });
+  }
+});
+
+router.get('/admin/restaurants/reject/:id', async (req, res) => {
+  if (!req.session.adminName || !req.session.zone) return res.redirect('/adminLogin');
+  try {
+    await db.query("UPDATE restaurants SET status = 'rejected' WHERE id = ?", [req.params.id]);
+    res.redirect('/admin/restaurants');
+  } catch (err) {
+    console.error('Reject failed:', err);
+    res.status(500).render('error', { message: 'Failed to reject restaurant.' });
+  }
+});
+
 router.post('/admin/restaurants/delete/:id', async (req, res) => {
   if (!req.session.adminName || !req.session.zone) {
     return res.redirect('/adminLogin');
   }
 
   try {
-    await db.query('UPDATE restaurants SET status = "rejected" WHERE id = ?', [req.params.id]);
+    await db.query("UPDATE restaurants SET status = 'rejected' WHERE id = ?", [req.params.id]);
     res.redirect('/admin/restaurants');
   } catch (err) {
     console.error('Soft delete failed:', err);
@@ -539,7 +562,7 @@ router.post('/admin/restaurants/restore/:id', async (req, res) => {
   }
 
   try {
-    await db.query('UPDATE restaurants SET status = "approved" WHERE id = ?', [req.params.id]);
+    await db.query("UPDATE restaurants SET status = 'approved' WHERE id = ?", [req.params.id]);
     res.redirect('/admin/restaurants');
   } catch (err) {
     console.error('Restore failed:', err);
