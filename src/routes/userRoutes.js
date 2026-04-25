@@ -220,7 +220,7 @@ router.get('/user/complaints', async (req, res) => {
     res.render('userViews/complaints', { complaints, restaurants });
   } catch (err) {
     console.error("Error fetching complaints:", err);
-    res.status(500).send("Server error");
+    res.status(500).send(`<pre>Server error: ${err.message}\n${err.stack}</pre>`);
   }
 });
 
