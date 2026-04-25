@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <title>Inspector Dashboard – FSSAI Inspector Hub</title>
@@ -7,157 +8,176 @@
   <link rel="stylesheet" href="/css/inspectorDashboard.css" />
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
+
 <body>
 
-<%- include('partials/header2') %>
+  <%- include('partials/header2') %>
 
-<div class="dashboard-container">
+    <div class="dashboard-container">
 
-  <!-- Greeting -->
-  <div class="dashboard-header">
-    <div>
-      <h1>Inspector Dashboard</h1>
-      <p>Welcome back, <%= inspectorName %></p>
-      <span class="zone"><%= zone %> – <%= region %></span>
-    </div>
-    <div class="status">
-    </div>
-  </div>
-
-  <!-- Stats -->
-  <div class="stats-grid">
-    <div class="stat-card blue">
-      <div>
-        <p>Restaurants in Region</p>
-        <h2 class="stat-value"><%= stats.approvedRestaurants %></h2>
+      <!-- Greeting -->
+      <div class="dashboard-header">
+        <div>
+          <h1>Inspector Dashboard</h1>
+          <p>Welcome back, <%= inspectorName %>
+          </p>
+          <span class="zone">
+            <%= zone %> – <%= region %>
+          </span>
+        </div>
+        <div class="status">
+        </div>
       </div>
-      <div class="stat-icon"><i data-lucide="building-2" class="lucide-icon blue"></i></div>
-    </div>
-    <div class="stat-card orange">
-      <div>
-        <p>Scheduled Inspections</p>
-        <h2 class="stat-value"><%= stats.scheduledInspections %></h2>
-      </div>
-      <div class="stat-icon"><i data-lucide="calendar" class="lucide-icon orange"></i></div>
-    </div>
-    <div class="stat-card green">
-      <div>
-        <p>Completed This Month</p>
-        <h2 class="stat-value"><%= stats.completedInspections %></h2>
-      </div>
-      <div class="stat-icon"><i data-lucide="check-circle" class="lucide-icon green"></i></div>
-    </div>
-    <div class="stat-card purple">
-      <div>
-        <p>Pending Approvals</p>
-        <h2 class="stat-value"><%= stats.pendingRestaurants %></h2>
-      </div>
-      <div class="stat-icon"><i data-lucide="clock" class="lucide-icon purple"></i></div>
-    </div>
-  </div>
 
-  <!-- Quick Actions -->
-  <div class="quick-actions">
-    <h3>Quick Actions</h3>
-    <div class="actions-grid">
-      <a href="/inspector/inspections/scheduled" class="action-card">
-        <i data-lucide="calendar" class="lucide-icon icon-box orange-bg"></i>
-        <div>
-          <h4>Scheduled Inspections</h4>
-          <p>View and conduct scheduled inspections</p>
-        </div>
-      </a>
-
-      <a href="/inspector/restaurants/add" class="action-card">
-        <i data-lucide="plus" class="lucide-icon icon-box green-bg"></i>
-        <div>
-          <h4>Add New Restaurant</h4>
-          <p>Register a new restaurant for inspection</p>
-        </div>
-      </a>
-
-      <a href="/inspector/restaurants" class="action-card">
-        <i data-lucide="eye" class="lucide-icon icon-box blue-bg"></i>
-        <div>
-          <h4>View Restaurants</h4>
-          <p>Browse all restaurants in your region</p>
-        </div>
-      </a>
-
-      <a href="/inspector/pastInspections" class="action-card">
-        <i data-lucide="file-text" class="lucide-icon icon-box purple-bg"></i>
-        <div>
-          <h4>Past Inspections</h4>
-          <p>View completed inspection reports</p>
-        </div>
-      </a>
-
-     <a href="/inspector/complaints" class="action-card">
-        <i data-lucide="alert-triangle" class="lucide-icon icon-box red-bg"></i>
-        <div>
-          <h4>View Complaints</h4>
-          <p>Manage pending and resolved complaints</p>
-        </div>
-      </a>
-    </div>
-  </div>
-
-  <!-- Today's Schedule -->
-<div class="card today-card">
-  <h3 class="card-heading">
-    <i data-lucide="calendar-days" class="lucide-icon heading-icon"></i>
-    Today’s Inspections
-  </h3>
-
-  <% if (todaysInspections.length > 0) { %>
-    <div class="activity-list">
-      <% todaysInspections.forEach(item => { %>
-        <div class="activity-item">
-          <div class="activity-left">
-            <i data-lucide="calendar" class="lucide-icon blue"></i>
-            <div class="activity-text">
-              <p class="title"><%= item.restaurant_name %></p>
-              <p class="desc"><%= item.address %></p>
-              <p class="desc small">Scheduled: <%= new Date(item.scheduled_date).toLocaleDateString() %></p>
-            </div>
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div>
+            <p>Restaurants in Region</p>
+            <h2 class="stat-value">
+              <%= stats.approvedRestaurants %>
+            </h2>
           </div>
-          <a href="/inspection/start/<%= item.id %>" class="btn btn-small">Start Inspection</a>
+          <div class="stat-icon"><i data-lucide="building-2" class="lucide-icon blue"></i></div>
         </div>
-      <% }) %>
+        <div class="stat-card orange">
+          <div>
+            <p>Scheduled Inspections</p>
+            <h2 class="stat-value">
+              <%= stats.scheduledInspections %>
+            </h2>
+          </div>
+          <div class="stat-icon"><i data-lucide="calendar" class="lucide-icon orange"></i></div>
+        </div>
+        <div class="stat-card green">
+          <div>
+            <p>Completed This Month</p>
+            <h2 class="stat-value">
+              <%= stats.completedInspections %>
+            </h2>
+          </div>
+          <div class="stat-icon"><i data-lucide="check-circle" class="lucide-icon green"></i></div>
+        </div>
+        <div class="stat-card purple">
+          <div>
+            <p>Pending Approvals</p>
+            <h2 class="stat-value">
+              <%= stats.pendingRestaurants %>
+            </h2>
+          </div>
+          <div class="stat-icon"><i data-lucide="clock" class="lucide-icon purple"></i></div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="quick-actions">
+        <h3>Quick Actions</h3>
+        <div class="actions-grid">
+          <a href="/inspector/inspections/scheduled" class="action-card">
+            <i data-lucide="calendar" class="lucide-icon icon-box orange-bg"></i>
+            <div>
+              <h4>Scheduled Inspections</h4>
+              <p>View and conduct scheduled inspections</p>
+            </div>
+          </a>
+
+          <a href="/inspector/restaurants/add" class="action-card">
+            <i data-lucide="plus" class="lucide-icon icon-box green-bg"></i>
+            <div>
+              <h4>Add New Restaurant</h4>
+              <p>Register a new restaurant for inspection</p>
+            </div>
+          </a>
+
+          <a href="/inspector/restaurants" class="action-card">
+            <i data-lucide="eye" class="lucide-icon icon-box blue-bg"></i>
+            <div>
+              <h4>View Restaurants</h4>
+              <p>Browse all restaurants in your region</p>
+            </div>
+          </a>
+
+          <a href="/inspector/pastInspections" class="action-card">
+            <i data-lucide="file-text" class="lucide-icon icon-box purple-bg"></i>
+            <div>
+              <h4>Past Inspections</h4>
+              <p>View completed inspection reports</p>
+            </div>
+          </a>
+
+          <a href="/inspector/complaints" class="action-card">
+            <i data-lucide="alert-triangle" class="lucide-icon icon-box red-bg"></i>
+            <div>
+              <h4>View Complaints</h4>
+              <p>Manage pending and resolved complaints</p>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Today's Schedule -->
+      <div class="card today-card">
+        <h3 class="card-heading">
+          <i data-lucide="calendar-days" class="lucide-icon heading-icon"></i>
+          Today’s Inspections
+        </h3>
+
+        <% if (todaysInspections.length> 0) { %>
+          <div class="activity-list">
+            <% todaysInspections.forEach(item=> { %>
+              <div class="activity-item">
+                <div class="activity-left">
+                  <i data-lucide="calendar" class="lucide-icon blue"></i>
+                  <div class="activity-text">
+                    <p class="title">
+                      <%= item.restaurant_name %>
+                    </p>
+                    <p class="desc">
+                      <%= item.address %>
+                    </p>
+                    <p class="desc small">Scheduled: <%= new Date(item.scheduled_date).toLocaleDateString() %>
+                    </p>
+                  </div>
+                </div>
+                <a href="/inspection/start/<%= item.id %>" class="btn btn-small">Start Inspection</a>
+              </div>
+              <% }) %>
+          </div>
+          <% } else { %>
+            <div class="empty-state">
+              <i data-lucide="alert-circle" class="lucide-icon gray"></i>
+              <p>No inspections scheduled for today</p>
+            </div>
+            <% } %>
+      </div>
+
+
     </div>
-  <% } else { %>
-    <div class="empty-state">
-      <i data-lucide="alert-circle" class="lucide-icon gray"></i>
-      <p>No inspections scheduled for today</p>
-    </div>
-  <% } %>
-</div>
 
+    <script>
+      lucide.createIcons();
+    </script>
+    <!-- Add this at the bottom of your inspector dashboard template -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      // Show success message if redirected from login
+      const urlParams = new URLSearchParams(window.location.search);
+      const success = urlParams.get('success');
 
-</div>
-
-<script>
-  lucide.createIcons();
-</script>
-<!-- Add this at the bottom of your inspector dashboard template -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-  // Show success message if redirected from login
-  const urlParams = new URLSearchParams(window.location.search);
-  const success = urlParams.get('success');
-
-  if (success) {
-    Swal.fire({
-      icon: 'success',
-      title: 'Login Successful',
-      text: 'Welcome back!',
-      timer: 2000,
-      showConfirmButton: false
-    }).then(() => {
-      // Clean URL after showing message
-      window.history.replaceState({}, document.title, window.location.pathname);
-    });
-  }
-</script>
+      if (success) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Login Successful',
+          text: 'Welcome back!',
+          timer: 2000,
+          showConfirmButton: false
+        }).then(() => {
+          // Clean URL after showing message
+          window.history.replaceState({}, document.title, window.location.pathname);
+        });
+      }
+    </script>
+    <%- include('partials/chatWidget') %>
 </body>
+
 </html>

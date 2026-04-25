@@ -96,15 +96,8 @@ Traditional food hygiene inspection systems are paper-based, slow, and opaque to
 <!-- Add screenshot here -->
 ![Home Page](screenshots/home.png)
 
-### 🔐 Login Pages
-<!-- Admin Login -->
-![Admin Login](screenshots/admin_login.png)
-
-<!-- Inspector Login -->
-![Inspector Login](screenshots/inspector_login.png)
-
-<!-- User Login -->
-![User Login](screenshots/user_login.png)
+### 🔐 Login Pages (Admin / Inspector / User)
+![Login Pages](screenshots/all-members-logins.png)
 
 ### 📊 Admin Dashboard
 <!-- Add screenshot here -->

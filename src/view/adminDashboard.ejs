@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <title>Admin Dashboard – FSSAI Inspector Hub</title>
@@ -7,119 +8,132 @@
   <link rel="stylesheet" href="/css/adminDashboard.css" />
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
+
 <body>
 
-<%- include('partials/header1') %>
+  <%- include('partials/header1') %>
 
-<div class="dashboard-container">
+    <div class="dashboard-container">
 
-  <!-- Greeting & Status -->
-  <div class="dashboard-header">
-    <div>
-      <h1>Admin Dashboard</h1>
-      <p>Welcome back, <%= adminName %></p>
-      <span class="zone">Managing: <%= zone %></span>
-    </div>
-    <div class="status">
-    </div>
-  </div>
-
-  <!-- Stats -->
-  <div class="stats-grid">
-    <div class="stat-card blue">
-      <div>
-        <p>Total Inspectors</p>
-        <h2 class="stat-value"><%= stats.totalInspectors %></h2>
-      </div>
-      <div class="stat-icon"><i data-lucide="users" class="lucide-icon blue"></i></div>
-    </div>
-    <div class="stat-card green">
-      <div>
-        <p>Registered Restaurants</p>
-        <h2 class="stat-value"><%= stats.approvedRestaurants %></h2>
-      </div>
-      <div class="stat-icon"><i data-lucide="building-2" class="lucide-icon green"></i></div>
-    </div>
-    <div class="stat-card orange">
-      <div>
-        <p>Pending Approvals</p>
-        <h2 class="stat-value"><%= stats.pendingRestaurants %></h2>
-      </div>
-      <div class="stat-icon"><i data-lucide="alert-triangle" class="lucide-icon orange"></i></div>
-    </div>
-    <div class="stat-card purple">
-      <div>
-        <p>Reports This Month</p>
-        <h2 class="stat-value"><%= stats.totalReports %></h2>
-      </div>
-      <div class="stat-icon"><i data-lucide="file-text" class="lucide-icon purple"></i></div>
-    </div>
-  </div>
-
-  <!-- Quick Actions -->
-  <div class="quick-actions">
-    <h3>Quick Actions</h3>
-    <div class="actions-grid">
-      <a href="/admin/inspectors" class="action-card">
-        <i data-lucide="users" class="lucide-icon icon-box blue-bg"></i>
+      <!-- Greeting & Status -->
+      <div class="dashboard-header">
         <div>
-          <h4>Manage Inspectors</h4>
-          <p>Add, edit, or remove inspectors in your zone</p>
+          <h1>Admin Dashboard</h1>
+          <p>Welcome back, <%= adminName %>
+          </p>
+          <span class="zone">Managing: <%= zone %></span>
         </div>
-      </a>
+        <div class="status">
+        </div>
+      </div>
 
-      <a href="/admin/restaurants" class="action-card">
-        <i data-lucide="building-2" class="lucide-icon icon-box green-bg"></i>
-        <div>
-          <h4>Review Restaurant Applications</h4>
-          <p>Approve or reject new restaurant registrations</p>
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div>
+            <p>Total Inspectors</p>
+            <h2 class="stat-value">
+              <%= stats.totalInspectors %>
+            </h2>
+          </div>
+          <div class="stat-icon"><i data-lucide="users" class="lucide-icon blue"></i></div>
         </div>
-      </a>
+        <div class="stat-card green">
+          <div>
+            <p>Registered Restaurants</p>
+            <h2 class="stat-value">
+              <%= stats.approvedRestaurants %>
+            </h2>
+          </div>
+          <div class="stat-icon"><i data-lucide="building-2" class="lucide-icon green"></i></div>
+        </div>
+        <div class="stat-card orange">
+          <div>
+            <p>Pending Approvals</p>
+            <h2 class="stat-value">
+              <%= stats.pendingRestaurants %>
+            </h2>
+          </div>
+          <div class="stat-icon"><i data-lucide="alert-triangle" class="lucide-icon orange"></i></div>
+        </div>
+        <div class="stat-card purple">
+          <div>
+            <p>Reports This Month</p>
+            <h2 class="stat-value">
+              <%= stats.totalReports %>
+            </h2>
+          </div>
+          <div class="stat-icon"><i data-lucide="file-text" class="lucide-icon purple"></i></div>
+        </div>
+      </div>
 
-      <a href="/admin/reports" class="action-card">
-        <i data-lucide="file-text" class="lucide-icon icon-box purple-bg"></i>
-        <div>
-          <h4>Review Inspection Reports</h4>
-          <p>Review and approve submitted inspection reports</p>
-        </div>
-      </a>
+      <!-- Quick Actions -->
+      <div class="quick-actions">
+        <h3>Quick Actions</h3>
+        <div class="actions-grid">
+          <a href="/admin/inspectors" class="action-card">
+            <i data-lucide="users" class="lucide-icon icon-box blue-bg"></i>
+            <div>
+              <h4>Manage Inspectors</h4>
+              <p>Add, edit, or remove inspectors in your zone</p>
+            </div>
+          </a>
 
-      <a href="/admin/inspections/schedule" class="action-card">
-        <i data-lucide="calendar" class="lucide-icon icon-box orange-bg"></i>
-        <div>
-          <h4>Schedule Inspections</h4>
-          <p>Assign inspectors to restaurant inspections</p>
+          <a href="/admin/restaurants" class="action-card">
+            <i data-lucide="building-2" class="lucide-icon icon-box green-bg"></i>
+            <div>
+              <h4>Review Restaurant Applications</h4>
+              <p>Approve or reject new restaurant registrations</p>
+            </div>
+          </a>
+
+          <a href="/admin/reports" class="action-card">
+            <i data-lucide="file-text" class="lucide-icon icon-box purple-bg"></i>
+            <div>
+              <h4>Review Inspection Reports</h4>
+              <p>Review and approve submitted inspection reports</p>
+            </div>
+          </a>
+
+          <a href="/admin/inspections/schedule" class="action-card">
+            <i data-lucide="calendar" class="lucide-icon icon-box orange-bg"></i>
+            <div>
+              <h4>Schedule Inspections</h4>
+              <p>Assign inspectors to restaurant inspections</p>
+            </div>
+          </a>
         </div>
-      </a>
+      </div>
     </div>
-  </div>
-</div>
 
-<script src="https://unpkg.com/lucide@latest"></script>
-<script>
-  lucide.createIcons();
-</script>
-<!-- Add this at the bottom of your adminDashboard.ejs -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-  // Show success message if redirected from login
-  const urlParams = new URLSearchParams(window.location.search);
-  const success = urlParams.get('success');
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+      lucide.createIcons();
+    </script>
+    <!-- Add this at the bottom of your adminDashboard.ejs -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      // Show success message if redirected from login
+      const urlParams = new URLSearchParams(window.location.search);
+      const success = urlParams.get('success');
 
-  if (success) {
-    Swal.fire({
-      icon: 'success',
-      title: 'Login Successful',
-      text: 'Welcome back!',
-      timer: 2000,
-      showConfirmButton: false
-    }).then(() => {
-      // Clean URL after showing message
-      window.history.replaceState({}, document.title, window.location.pathname);
-    });
-  }
-</script>
+      if (success) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Login Successful',
+          text: 'Welcome back!',
+          timer: 2000,
+          showConfirmButton: false
+        }).then(() => {
+          // Clean URL after showing message
+          window.history.replaceState({}, document.title, window.location.pathname);
+        });
+      }
+    </script>
 
+
+    <%- include('partials/chatWidget') %>
 
 </body>
+
 </html>
