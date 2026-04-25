@@ -4,10 +4,19 @@ const app = express();
 const db = require('./src/config/dbConnect');
 const session = require('express-session');
 
+// Trust Render's proxy (required for sessions + cookies on Render)
+app.set('trust proxy', 1);
+
+
 app.use(session({
-  secret: 'kldsfjbvkaelugivdbsbvhi',
+  secret: process.env.SESSION_SECRET || 'kldsfjbvkaelugivdbsbvhi',
   resave: false,
-  saveUninitialized: true
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
 }));
 
 const cors = require('cors');
