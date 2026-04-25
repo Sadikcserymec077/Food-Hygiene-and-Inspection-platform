@@ -608,6 +608,17 @@ router.get('/inspector/complaints/:id', async (req, res) => {
 
     if (!complaint) return res.status(404).send('Complaint not found or unauthorized');
 
+    // Safe JSON parsing to prevent EJS template crashes
+    let parsedImages = [];
+    if (complaint.images) {
+      try {
+        parsedImages = typeof complaint.images === 'string' ? JSON.parse(complaint.images) : complaint.images;
+      } catch (err) {
+        console.error("Failed to parse images:", err);
+      }
+    }
+    complaint.images = parsedImages;
+
     res.render('detailedComplaint', { complaint });
   } catch (err) {
     console.error(err);
