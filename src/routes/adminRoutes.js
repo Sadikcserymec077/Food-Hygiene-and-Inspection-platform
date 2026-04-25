@@ -734,7 +734,7 @@ router.post('/admin/restaurants/approve/:id', async (req, res) => {
   if (!req.session.adminName || !req.session.zone) {
     return res.redirect('/adminLogin');
   }
-  await db.query('UPDATE restaurants SET status = "approved" WHERE id = ?', [req.params.id]);
+  await db.query("UPDATE restaurants SET status = 'approved' WHERE id = ?", [req.params.id]);
   res.redirect('/admin/restaurants');
 });
 
@@ -743,7 +743,7 @@ router.post('/admin/restaurants/reject/:id', async (req, res) => {
   if (!req.session.adminName || !req.session.zone) {
     return res.redirect('/adminLogin');
   }
-  await db.query('UPDATE restaurants SET status = "rejected" WHERE id = ?', [req.params.id]);
+  await db.query("UPDATE restaurants SET status = 'rejected' WHERE id = ?", [req.params.id]);
   res.redirect('/admin/restaurants');
 });
 router.get('/admin/restaurants/approvals', async (req, res) => {
