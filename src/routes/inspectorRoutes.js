@@ -6,7 +6,7 @@ const fs = require('fs');
 const qs = require('qs');
 const db = require('../config/dbConnect');
 
-const { checklistSchema, sectionLabels } = require('../data/inspectionCategories');
+const { checklistSchema, checklistWeights, sectionLabels } = require('../data/inspectionCategories');
 const emailService = require('../services/emailService');
 const PDFService = require('../services/pdfService');
 const { storage } = require('../config/cloudinary');
@@ -302,6 +302,7 @@ router.get('/inspection/start/:id', async (req, res) => {
       inspection,
       restaurant,
       checklistSchema,
+      checklistWeights,
       sectionLabels,
       hygieneScore,
       scoreBadge
