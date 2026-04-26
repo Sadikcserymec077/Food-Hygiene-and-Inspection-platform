@@ -118,9 +118,6 @@ Traditional food hygiene inspection systems are paper-based, slow, and opaque to
 
 ## 📸 Screenshots
 
-### 🏠 Home Page
-![Home Page](screenshots/home.png)
-
 ### 🔐 Login Pages (Admin / Inspector / User)
 ![Login Pages](screenshots/all-members-logins.png)
 
@@ -138,9 +135,6 @@ Traditional food hygiene inspection systems are paper-based, slow, and opaque to
 
 ### 🙋 User Dashboard
 ![User Dashboard](screenshots/user_dashboard.png)
-
-### 🤖 AI Chatbot (HygieneBot)
-![Chatbot](screenshots/chatbot.png)
 
 ---
 
