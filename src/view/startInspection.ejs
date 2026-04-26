@@ -47,13 +47,7 @@
           <p>Complete the hygiene inspection checklist</p>
         </div>
         <div style="text-align: right;">
-          <span class="badge <%= scoreBadge %>">Manual Target: <%= hygieneScore %>/5.0</span>
-          <div id="live-auto-score-container" style="margin-top: 8px;">
-            <span id="live-auto-score-badge"
-              style="background: #6366f1; color: white; padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; box-shadow: 0 4px 6px rgba(99, 102, 241, 0.2);">
-              Standardized Auto-Score: <span id="live-auto-score-value">0.00</span> / 5.0
-            </span>
-          </div>
+          <span class="badge <%= scoreBadge %>">Previous Score: <%= hygieneScore %>/5.0</span>
         </div>
       </div>
 
@@ -187,6 +181,19 @@
                   </button>
                 </div>
               </div>
+            </div>
+
+            <!-- Live Auto-Score Summary -->
+            <div
+              style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 16px; text-align: center;">
+              <p
+                style="font-size: 0.85rem; color: #64748b; margin-bottom: 8px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em;">
+                Standardized Auto-Score</p>
+              <div id="live-auto-score-badge"
+                style="display: inline-block; background: #6366f1; color: white; padding: 10px 28px; border-radius: 99px; font-size: 1.4rem; font-weight: 700; box-shadow: 0 4px 12px rgba(99,102,241,0.3); transition: background 0.3s;">
+                <span id="live-auto-score-value">0.00</span> / 5.0
+              </div>
+              <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 8px;">Updates live as you check items above</p>
             </div>
 
             <!-- Submit -->
